@@ -1,0 +1,10 @@
+[
+  {
+    "title": "Golden Royale",
+    "emoji": "🎰",
+    "desc": "Казино на виртуальные деньги: слоты, рулетка, дурак и другие игры",
+    "path": "games/casino/",
+    "color": "#f5c451",
+    "new": true
+  }
+]

@@ -1,0 +1,680 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Golden Royale — казино-симулятор</title>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0b0710;--panel:#160d22;--panel2:#1f1330;--gold:#f5c451;--gold2:#ffe9a8;--red:#e0364f;--green:#1fbf75;--text:#f3ecff;--mut:#9a8cb5;color-scheme:dark;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:radial-gradient(ellipse at 50% -10%,#3a1856 0%,var(--bg) 60%) fixed;color:var(--text);font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;min-height:100vh}
+.wrap{max-width:760px;margin:0 auto;padding:18px 14px 40px}
+h1{font-family:Cinzel,Georgia,serif;font-weight:800;text-align:center;margin:6px 0 2px;font-size:clamp(26px,6vw,40px);letter-spacing:.12em;background:linear-gradient(180deg,var(--gold2),var(--gold) 60%,#b8861f);-webkit-background-clip:text;background-clip:text;color:transparent}
+.sub{text-align:center;color:var(--mut);font-size:13px;letter-spacing:.3em;text-transform:uppercase;margin-bottom:16px}
+.bank{display:flex;align-items:center;justify-content:space-between;gap:10px;background:linear-gradient(135deg,var(--panel2),var(--panel));border:1px solid #4a3470;border-radius:16px;padding:14px 18px;box-shadow:0 0 30px #f5c45122}
+.bank small{color:var(--mut);display:block;font-size:12px;letter-spacing:.15em;text-transform:uppercase}
+#money{font-family:Cinzel,Georgia,serif;font-size:clamp(28px,7vw,40px);font-weight:800;color:var(--gold)}
+.tabs{display:flex;flex-wrap:wrap;gap:8px;margin:16px 0}
+.tab{flex:1 1 30%;padding:11px 6px;border-radius:12px;border:1px solid #4a3470;background:var(--panel);color:var(--mut);font:600 14px Inter,sans-serif;cursor:pointer}
+.tab.on{color:#1b1100;background:linear-gradient(180deg,var(--gold2),var(--gold));border-color:var(--gold);box-shadow:0 0 20px #f5c45155}
+.card{background:linear-gradient(160deg,var(--panel2),var(--panel));border:1px solid #4a3470;border-radius:20px;padding:18px;box-shadow:0 10px 40px #0008}
+.reels{display:flex;justify-content:center;gap:10px;padding:16px;border-radius:16px;background:#07040c;border:2px solid var(--gold);box-shadow:inset 0 0 30px #000,0 0 30px #f5c45133}
+.reel{width:min(26vw,120px);aspect-ratio:3/4;display:grid;place-items:center;font-size:min(14vw,64px);background:linear-gradient(180deg,#1a1026,#2b1b40 50%,#1a1026);border-radius:12px;border:1px solid #5a3f86}
+.reel.spin{filter:blur(1.5px)}
+.chips{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin:0 0 14px}
+.chip{min-width:58px;padding:10px 12px;border-radius:999px;border:2px dashed #7a5bb0;background:var(--panel);color:var(--text);font:600 14px Inter,sans-serif;cursor:pointer}
+.chip.on{border:2px solid var(--gold);color:var(--gold);box-shadow:0 0 14px #f5c45155}
+.big{display:block;width:100%;margin-top:12px;padding:15px;border:0;border-radius:14px;font:800 17px Cinzel,Georgia,serif;letter-spacing:.1em;color:#1b1100;background:linear-gradient(180deg,var(--gold2),var(--gold) 55%,#c48f22);cursor:pointer;box-shadow:0 6px 0 #7a5410,0 10px 24px #f5c45133}
+.big:active{transform:translateY(4px);box-shadow:0 2px 0 #7a5410}
+.big:disabled,.sm:disabled,.ghost:disabled,.bets button:disabled{opacity:.45;cursor:not-allowed}
+.msg{min-height:30px;text-align:center;font-weight:600;margin-top:12px;font-size:17px}
+.win{color:var(--gold);text-shadow:0 0 14px #f5c451aa}.lose{color:var(--mut)}
+.pay{color:var(--mut);font-size:12px;text-align:center;margin-top:8px;line-height:1.6}
+.bets{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:10px}
+.bets button{padding:13px 4px;border:0;border-radius:12px;font:800 14px Inter,sans-serif;color:#fff;cursor:pointer}
+.bR{background:var(--red)}.bB{background:#2c2c3d;border:1px solid #666!important}.bO{background:#5a3f86}
+.numrow{display:flex;gap:8px;margin-top:8px}
+.numrow input{width:80px;padding:10px;border-radius:10px;border:1px solid #5a3f86;background:#0b0710;color:var(--text);font:700 16px Inter,sans-serif;text-align:center}
+.numrow button{flex:1;padding:10px;border:0;border-radius:10px;background:var(--green);color:#04210f;font:800 14px Inter,sans-serif;cursor:pointer}
+.res{text-align:center;font:800 22px Cinzel,Georgia,serif;min-height:30px;margin-top:6px}
+.fw{position:relative;width:min(300px,80vw);margin:6px auto 0}
+.fw canvas{width:100%;display:block;border-radius:50%;border:5px solid var(--gold);box-shadow:0 0 30px #f5c45144;transition:transform 4.5s cubic-bezier(.12,.7,.1,1)}
+.ptr{position:absolute;left:50%;top:-12px;margin-left:-12px;border:12px solid transparent;border-top:24px solid var(--gold2);z-index:2;filter:drop-shadow(0 2px 4px #000)}
+.up{position:relative;width:min(260px,70vw);aspect-ratio:1;margin:6px auto 14px}
+.ring{position:absolute;inset:0;border-radius:50%;-webkit-mask:radial-gradient(circle,transparent 60%,#000 61%);mask:radial-gradient(circle,transparent 60%,#000 61%)}
+.arrow{position:absolute;inset:0}
+.arrow:before{content:"";position:absolute;left:50%;top:-4px;width:6px;height:48%;margin-left:-3px;background:linear-gradient(var(--gold2),transparent);border-radius:4px}
+.upt{position:absolute;inset:0;display:grid;place-items:center;text-align:center;font:800 30px Cinzel,Georgia,serif;color:var(--gold)}
+.upt small{display:block;font:600 12px Inter,sans-serif;color:var(--mut)}
+.hand{display:flex;gap:6px;justify-content:center;min-height:74px;margin:4px 0}
+.pc{width:48px;height:68px;border-radius:8px;background:#f6efe0;color:#1b1100;display:flex;flex-direction:column;align-items:center;justify-content:center;font:800 19px Inter,sans-serif;box-shadow:0 4px 10px #0007;animation:pop .3s}
+.pc b{font-size:20px}.pc.rd{color:#c0182f}
+.pc.back{background:repeating-linear-gradient(45deg,#3a1856,#3a1856 6px,#5a3f86 6px,#5a3f86 12px);border:2px solid var(--gold2)}
+@keyframes pop{from{transform:translateY(-16px) scale(.8);opacity:0}}
+.who{text-align:center;color:var(--mut);font-size:13px;letter-spacing:.1em;text-transform:uppercase;margin-top:6px}
+.who b{color:var(--gold2)}
+.acts{display:flex;gap:8px;margin-top:10px}
+.sm{flex:1;padding:12px 4px;border:0;border-radius:12px;background:#5a3f86;color:#fff;font:700 14px Inter,sans-serif;cursor:pointer}
+.row{display:flex;gap:8px;margin-top:16px}
+.ghost{flex:1;padding:12px;border-radius:12px;border:1px solid #4a3470;background:transparent;color:var(--text);font:600 14px Inter,sans-serif;cursor:pointer}
+.hist{display:flex;gap:6px;justify-content:center;flex-wrap:wrap;margin-top:12px;min-height:24px}
+.hist span{padding:3px 9px;border-radius:8px;font-size:13px;font-weight:700}
+.hist .p{background:#f5c45126;color:var(--gold)}.hist .m{background:#ffffff14;color:var(--mut)}
+.hidden{display:none}
+.flash{animation:fl .7s}
+@keyframes fl{0%{box-shadow:0 0 0 #f5c451}40%{box-shadow:0 0 80px 10px #f5c451aa}100%{box-shadow:0 0 30px #f5c45122}}
+*{font-family:'VT323',monospace!important}
+h1,.big,#money,.upt,.res,#best{font-family:'Press Start 2P',monospace!important}
+body{font-size:20px;background:#17171c;background-image:linear-gradient(#ffffff08 1px,transparent 1px),linear-gradient(90deg,#ffffff08 1px,transparent 1px);background-size:32px 32px}
+h1{background:none;-webkit-text-fill-color:currentColor;color:#f5c451;font-size:clamp(18px,5vw,30px);text-shadow:3px 3px 0 #7a4a00,6px 6px 0 #000;line-height:1.4}
+.sub{font-size:18px;letter-spacing:.2em}
+.card,.bank{background:#2b2b33;border:4px solid #000;border-radius:0;box-shadow:inset 4px 4px 0 #4a4a56,inset -4px -4px 0 #1b1b21}
+.bank small{font-size:17px}
+#money{font-size:clamp(16px,4.6vw,24px);text-shadow:3px 3px 0 #000}
+#best{font-size:12px}
+.tab,.chip,.sm,.ghost,.bets button,.numrow button,.numrow input{border-radius:0!important;border:3px solid #000!important;background:#7a7a86;color:#fff;font-size:19px;text-shadow:2px 2px 0 #000;box-shadow:inset 3px 3px 0 #a5a5b2,inset -3px -3px 0 #4e4e58}
+.tab.on,.chip.on{background:#4caf50;box-shadow:inset 3px 3px 0 #86d97f,inset -3px -3px 0 #2c7a30}
+.bets .bR{background:#c0392b;box-shadow:inset 3px 3px 0 #ef7b6e,inset -3px -3px 0 #7d2118}
+.bets .bB{background:#2a2a30}
+.numrow button{background:#4caf50}
+.numrow input{background:#111;box-shadow:inset 3px 3px 0 #000}
+.big{border-radius:0;border:4px solid #000;font-size:13px;line-height:1.5;text-shadow:none;box-shadow:inset 4px 4px 0 #fff8c8,inset -4px -4px 0 #b9831a,0 6px 0 #000}
+.big:active{transform:translateY(4px);box-shadow:inset 4px 4px 0 #fff8c8,inset -4px -4px 0 #b9831a,0 2px 0 #000}
+.reels{border-radius:0;border:4px solid #000;background:#0e0e12;box-shadow:inset 0 0 0 3px #f5c451}
+.reel,.pc{border-radius:0;border:3px solid #000}
+.pc{font-size:22px}
+.hist span{border-radius:0;font-size:17px}
+.msg{font-size:22px;text-shadow:2px 2px 0 #000}
+.pay,.who{font-size:17px}
+.res{font-size:14px;line-height:1.5}
+.upt{font-size:22px}.upt small{font-size:17px}
+canvas{image-rendering:pixelated}
+.hand{flex-wrap:wrap}
+.pc.ok{outline:3px solid #f5c451;cursor:pointer}
+.pair{position:relative;width:66px;height:86px}.pair .pc:nth-child(2){position:absolute;left:16px;top:16px}
+.tut{background:#14141a;border:3px solid #000;box-shadow:inset 3px 3px 0 #3a3a44;padding:12px 14px;margin-bottom:14px;font-size:20px;line-height:1.35;color:#d8ffd8}
+.tut ol{margin:6px 0 0;padding-left:24px}.tut b{color:#f5c451}
+#slots{background:linear-gradient(#8a2434,#4a0f19);border:4px solid #000;box-shadow:inset 0 0 0 4px #e0b341;padding:14px}
+#roul,#bj,#duel,#durak{background:radial-gradient(ellipse at 50% 40%,#2f8f58,#14502a);border:4px solid #000;box-shadow:inset 0 0 0 4px #0b2f19;padding:14px}
+#fort,#up{background:radial-gradient(circle at 50% 30%,#4a2178,#12091c);border:4px solid #000;box-shadow:inset 0 0 0 4px #f5c451;padding:14px}
+.pay{color:#e6e0f5}
+.tab:hover,.chip:hover,.sm:hover,.ghost:hover,.bets button:hover{filter:brightness(1.18)}
+h1{animation:glow 2.5s infinite alternate}
+@keyframes glow{from{filter:drop-shadow(0 0 0 #f5c451)}to{filter:drop-shadow(0 0 14px #f5c451)}}
+.pc{width:52px;height:74px;font-size:24px}
+.pair{width:72px;height:96px}.pair .pc:nth-child(2){left:18px;top:18px}
+.bt{background:#0006;border:3px solid #000;padding:6px 12px;min-width:100px;text-align:center;font-size:19px;line-height:1.2}
+.bt.atk{box-shadow:0 0 0 3px #f5c451}.bt.dfn{box-shadow:0 0 0 3px #4caf50}
+.fw{width:min(560px,96vw)}
+.ptr{margin-left:-18px;top:-18px;border-width:18px;border-top-width:34px;border-top-color:var(--gold2)}
+#fort .big{margin-top:18px}
+</style>
+</head>
+<body>
+<a href="../../" style="position:fixed;top:8px;left:8px;z-index:9;padding:6px 10px;background:#000c;color:#f5c451;border:2px solid #f5c451;font:18px VT323,monospace;text-decoration:none">← Все игры</a>
+<div class="wrap">
+  <h1>GOLDEN ROYALE</h1>
+  <div class="sub">Виртуальное казино</div>
+  <div class="bank" id="bank">
+    <div><small>Баланс</small><div id="money">$0</div></div>
+    <div style="text-align:right"><small>Рекорд</small><div id="best" style="font-weight:700;color:var(--gold2)">$0</div></div>
+  </div>
+  <div class="tabs" id="tabs">
+    <button class="tab on" data-t="slots">🎰 Слоты</button>
+    <button class="tab" data-t="roul">🎡 Рулетка</button>
+    <button class="tab" data-t="fort">🎯 Фортуна</button>
+    <button class="tab" data-t="up">⚡ Апгрейдер</button>
+    <button class="tab" data-t="bj">🂡 21</button>
+    <button class="tab" data-t="duel">🤖 Дуэль</button>
+    <button class="tab" data-t="durak">🃏 Дурак</button>
+  </div>
+  <div class="card">
+    <div class="chips" id="chips"></div>
+    <button class="ghost" id="tutbtn" style="width:100%;margin-bottom:12px">❓ Как играть</button>
+    <div class="tut hidden" id="tut"></div>
+
+    <div id="slots" class="g">
+      <div class="reels"><div class="reel" id="r0">🍒</div><div class="reel" id="r1">🍋</div><div class="reel" id="r2">🔔</div></div>
+      <button class="big act" id="spin">КРУТИТЬ</button>
+      <div class="pay">3 в ряд: 🍒×5 · 🍋×8 · 🔔×15 · ⭐×25 · 💎×50 · 7️⃣×100 · любые 2 одинаковых ×1.5</div>
+    </div>
+
+    <div id="roul" class="g hidden">
+      <canvas id="rc" width="320" height="320" style="width:100%;max-width:320px;display:block;margin:auto"></canvas>
+      <div class="res" id="rres"></div>
+      <div class="bets">
+        <button class="bR act" data-b="r">Красное ×2</button>
+        <button class="bB act" data-b="b">Чёрное ×2</button>
+        <button class="bO act" data-b="e">Чёт ×2</button>
+        <button class="bO act" data-b="o">Нечёт ×2</button>
+      </div>
+      <div class="numrow"><input id="rnum" type="number" min="0" max="36" value="7"><button class="act" data-b="n">Поставить на число ×36</button></div>
+    </div>
+
+    <div id="fort" class="g hidden">
+      <div class="fw"><div class="ptr"></div><canvas id="fc" width="640" height="640"></canvas></div>
+      <button class="big act" id="fbtn">КРУТИТЬ КОЛЕСО</button>
+      <div class="pay">Выигрыш = ставка × число на секторе</div>
+    </div>
+
+    <div id="up" class="g hidden">
+      <div class="up"><div class="ring" id="ring"></div><div class="arrow" id="arr"></div><div class="upt" id="upt"></div></div>
+      <div class="chips" id="mults"></div>
+      <button class="big act" id="upbtn">АПГРЕЙД</button>
+      <div class="pay">Чем больше множитель — тем меньше шанс попасть в зелёный сектор</div>
+    </div>
+
+    <div id="bj" class="g hidden">
+      <div class="who">Дилер-бот Макс · <b id="bjdt">0</b></div><div class="hand" id="bjd"></div>
+      <div class="hand" id="bjp"></div><div class="who">Ты · <b id="bjpt">0</b></div>
+      <button class="big act" id="bjdeal">РАЗДАТЬ</button>
+      <div class="acts"><button class="sm" id="bjH">Ещё</button><button class="sm" id="bjS">Хватит</button><button class="sm" id="bjD">Удвоить</button></div>
+      <div class="pay">Блэкджек платит ×2.5 · дилер берёт до 17</div>
+    </div>
+
+    <div id="duel" class="g hidden">
+      <div class="who">Бот Виктор · банк <b id="bbank">$5 000</b></div><div class="hand" id="dbot"></div>
+      <div class="hand" id="dme"></div><div class="who">Твоя карта</div>
+      <button class="big act" id="ddeal">РАЗДАТЬ</button>
+      <div class="acts"><button class="sm" id="dS">Вскрыть</button><button class="sm" id="dR">Поднять ×2</button><button class="sm" id="dF">Сбросить</button></div>
+      <div class="pay">Старшая карта побеждает (туз — старший). Поднимешь ставку — бот может испугаться и сбросить!</div>
+    </div>
+
+    <div id="durak" class="g hidden">
+      <div class="chips" id="dkN"></div>
+      <div class="who">Колода: <b id="dkd">0</b> · козырь: <b id="dkt"></b></div>
+      <div class="hand" id="dkbot"></div>
+      <div class="hand" id="dktab" style="min-height:96px"></div>
+      <div class="hand my" id="dkme"></div>
+      <button class="big act" id="dkdeal">РАЗДАТЬ</button>
+      <div class="acts"><button class="sm" id="dkTake">Беру</button><button class="sm" id="dkEnd">Бито / Пас</button></div>
+      <div class="pay">Выигрывает тот, кто первым избавится от карт. Подсвеченные карты — ими можно ходить.</div>
+    </div>
+
+    <div class="msg" id="msg"></div>
+    <div class="hist" id="hist"></div>
+    <div class="row">
+      <button class="ghost" id="bonus">🎁 Бонус +500</button>
+      <button class="ghost" id="reset">Сбросить игру</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+var START=1000,BETS=[10,50,100,500,1000],PI=Math.PI,T2=PI*2;
+var st={money:START,best:START,bet:50};
+try{var sv=JSON.parse(localStorage.getItem('goldenRoyale')||'null');if(sv&&typeof sv.money==='number')st=sv;}catch(e){}
+var $=function(i){return document.getElementById(i)},busy=false,shown=st.money;
+var rnd=function(a){return a[Math.floor(Math.random()*a.length)]};
+function save(){try{localStorage.setItem('goldenRoyale',JSON.stringify(st))}catch(e){}}
+function fmt(n){return '$'+Math.floor(n).toLocaleString('ru-RU')}
+function render(){
+  if(st.money>st.best)st.best=st.money;
+  $('best').textContent=fmt(st.best);
+  var from=shown,to=st.money,t0=performance.now();
+  (function step(t){var k=Math.min(1,(t-t0)/500);shown=from+(to-from)*k;$('money').textContent=fmt(shown);if(k<1)requestAnimationFrame(step)})(t0);
+  document.querySelectorAll('.chip[data-v]').forEach(function(c){c.classList.toggle('on',+c.dataset.v===st.bet)});
+  save();
+}
+function say(t,c){var m=$('msg');m.textContent=t;m.className='msg '+(c||'')}
+function hist(t,w){var h=$('hist'),e=document.createElement('span');e.className=w?'p':'m';e.textContent=t;h.prepend(e);while(h.children.length>8)h.lastChild.remove()}
+function flash(){var b=$('bank');b.classList.remove('flash');void b.offsetWidth;b.classList.add('flash')}
+function lock(v){busy=v;document.querySelectorAll('.act').forEach(function(b){b.disabled=v})}
+function take(){
+  if(st.bet<=0||st.money<st.bet){say('Не хватает денег — уменьши ставку или возьми бонус','lose');return false}
+  st.money-=st.bet;render();say('');return true;
+}
+function done(win,bet,txt){
+  if(win>0){st.money+=win;if(win>bet)flash()}
+  say(txt,win>bet?'win':'lose');
+  hist((win>=bet?'+':'−')+fmt(Math.abs(win-bet)),win>bet);render();
+}
+
+/* фишки */
+BETS.forEach(function(v){
+  var b=document.createElement('button');b.className='chip';b.dataset.v=v;b.textContent='$'+v;
+  b.onclick=function(){st.bet=v;render()};$('chips').appendChild(b);
+});
+var mx=document.createElement('button');mx.className='chip';mx.textContent='ВА-БАНК';
+mx.onclick=function(){if(st.money>0){st.bet=st.money;render();document.querySelectorAll('.chip').forEach(function(c){c.classList.remove('on')});mx.classList.add('on')}};
+$('chips').appendChild(mx);
+
+/* вкладки */
+document.querySelectorAll('.tab').forEach(function(t){
+  t.onclick=function(){
+    if(busy)return;
+    document.querySelectorAll('.tab').forEach(function(x){x.classList.toggle('on',x===t)});
+    document.querySelectorAll('.g').forEach(function(g){g.classList.toggle('hidden',g.id!==t.dataset.t)});cur=t.dataset.t;tutShow(!seen[cur]);
+    say('');
+  };
+});
+
+/* ТУТОРИАЛЫ */
+var TUT={
+slots:'<li>Выбери ставку фишкой сверху.</li><li>Нажми «КРУТИТЬ».</li><li>Три одинаковых символа — большой выигрыш (семёрки ×100!), два одинаковых — ×1.5.</li>',
+roul:'<li>Выбери ставку фишкой.</li><li>Выбери, на что ставишь: красное, чёрное, чёт или нечёт (выплата ×2), либо введи число от 0 до 36 (выплата ×36).</li><li>Шарик закрутится и упадёт в ячейку. Если выпало зеро, проигрывают все ставки, кроме числа 0.</li>',
+fort:'<li>Выбери ставку.</li><li>Нажми «КРУТИТЬ КОЛЕСО».</li><li>Стрелка сверху покажет сектор: ставка умножается на число в нём. Знак ✖ значит, что ты проиграл.</li>',
+up:'<li>Выбери множитель (×1.5, ×2 и так далее).</li><li>Чем он больше, тем меньше зелёный сектор — шанс падает.</li><li>Нажми «АПГРЕЙД»: если стрелка остановится в зелёном, получишь ставку × множитель, иначе ставка сгорит.</li>',
+bj:'<li>Цель: набрать 21 или больше, чем у дилера, но не перебрать.</li><li>Карты 2–10 считаются по номиналу, J, Q, K — это 10, туз — 1 или 11.</li><li>«Ещё» — взять карту, «Хватит» — остановиться, «Удвоить» — ставка ×2 и ещё одна карта.</li><li>Дилер берёт карты, пока у него меньше 17.</li>',
+duel:'<li>Нажми «РАЗДАТЬ»: у тебя и у бота по карте, его карта закрыта.</li><li>«Вскрыть» — у кого карта старше, тот забирает банк.</li><li>«Поднять ×2» — удвоить ставку: слабый бот может испугаться и сбросить. «Сбросить» — вернётся половина ставки.</li>',
+durak:'<li>У каждого по 6 карт. Одна масть — козырь, он бьёт любую обычную масть.</li><li>Ты атакуешь: нажми на подсвеченную карту. Бот должен побить её старшей картой той же масти или козырем.</li><li>Бот атакует: нажми на подсвеченную карту, которой можно побить, или «Беру», чтобы забрать карты.</li><li>Можно подкидывать карты того же достоинства, что уже лежат на столе. «Бито» — закончить ход.</li><li>Когда колода пуста, кто первым избавится от карт — победил (получаешь ставку ×2). Кто остался с картами — дурак и теряет ставку.</li><li>Упрощение: если бот берёт карты, подкидывать ему нельзя.</li>'
+},cur='slots',seen={};
+function tutShow(v){var t=$('tut');t.classList.toggle('hidden',!v);if(v){t.innerHTML='<b>📖 Как играть</b><ol>'+TUT[cur]+'</ol>';seen[cur]=1}}
+$('tutbtn').onclick=function(){tutShow($('tut').classList.contains('hidden'))};
+tutShow(true);
+
+/* СЛОТЫ */
+var SYM=['🍒','🍒','🍒','🍒','🍒','🍒','🍋','🍋','🍋','🍋','🍋','🔔','🔔','🔔','🔔','⭐','⭐','⭐','💎','💎','7️⃣'];
+var MULT={'🍒':5,'🍋':8,'🔔':15,'⭐':25,'💎':50,'7️⃣':100};
+$('spin').onclick=function(){
+  if(busy||!take())return;lock(true);
+  var bet=st.bet,res=[rnd(SYM),rnd(SYM),rnd(SYM)],n=0;
+  for(let i=0;i<3;i++){
+    let el=$('r'+i);el.classList.add('spin');
+    let iv=setInterval(function(){el.textContent=rnd(SYM)},70);
+    setTimeout(function(){
+      clearInterval(iv);el.textContent=res[i];el.classList.remove('spin');
+      if(++n===3){
+        var a=res[0],b=res[1],c=res[2],w=0;
+        if(a===b&&b===c)w=bet*MULT[a];else if(a===b||b===c||a===c)w=Math.floor(bet*1.5);
+        done(w,bet,w?((a===b&&b===c?'ДЖЕКПОТ! ':'Выигрыш ')+'+'+fmt(w)):'Не повезло… попробуй ещё');lock(false);
+      }
+    },900+i*450);
+  }
+};
+
+/* РУЛЕТКА с шариком */
+var ORD=[0,32,15,19,4,21,2,25,17,34,6,27,13,36,11,30,8,23,10,5,24,16,33,1,20,14,31,9,22,18,29,7,28,12,35,3,26];
+var REDS=[1,3,5,7,9,12,14,16,18,19,21,23,25,27,30,32,34,36],STEP=T2/37;
+var cx=$('rc').getContext('2d'),S=320,R=S/2-4,wa=0,ba=0,br=.93,showBall=false;
+function colr(n){return n===0?'#1fbf75':REDS.indexOf(n)>-1?'#c0273f':'#17171f'}
+function drawR(){
+  cx.clearRect(0,0,S,S);cx.save();cx.translate(S/2,S/2);
+  cx.beginPath();cx.arc(0,0,R,0,T2);cx.fillStyle='#4a2d12';cx.fill();
+  cx.lineWidth=3;cx.strokeStyle='#f5c451';cx.stroke();
+  for(var i=0;i<37;i++){
+    var c=wa+i*STEP-PI/2,n=ORD[i];
+    cx.beginPath();cx.moveTo(0,0);cx.arc(0,0,R*.86,c-STEP/2,c+STEP/2);cx.closePath();
+    cx.fillStyle=colr(n);cx.fill();cx.lineWidth=1;cx.strokeStyle='#f5c45188';cx.stroke();
+    cx.save();cx.rotate(c);cx.translate(R*.76,0);cx.rotate(PI/2);
+    cx.fillStyle='#fff';cx.font='bold 11px Inter,sans-serif';cx.textAlign='center';cx.fillText(n,0,4);cx.restore();
+  }
+  var g=cx.createRadialGradient(0,0,0,0,0,R*.55);g.addColorStop(0,'#3a1856');g.addColorStop(1,'#12091c');
+  cx.beginPath();cx.arc(0,0,R*.55,0,T2);cx.fillStyle=g;cx.fill();cx.strokeStyle='#f5c451';cx.lineWidth=2;cx.stroke();
+  cx.beginPath();cx.arc(0,0,10,0,T2);cx.fillStyle='#f5c451';cx.fill();
+  for(var k=0;k<4;k++){cx.save();cx.rotate(wa+k*PI/2);cx.fillRect(-2,-R*.5,4,R*.38);cx.restore()}
+  if(showBall){
+    cx.beginPath();cx.arc(Math.cos(ba)*R*br,Math.sin(ba)*R*br,6,0,T2);
+    cx.fillStyle='#fff';cx.shadowColor='#fff';cx.shadowBlur=10;cx.fill();cx.shadowBlur=0;
+  }
+  cx.restore();
+}
+drawR();
+function rouletteSpin(pick){
+  if(busy||!take())return;
+  var num=Math.max(0,Math.min(36,parseInt($('rnum').value)||0)),bet=st.bet;
+  lock(true);$('rres').textContent='';showBall=true;
+  var idx=Math.floor(Math.random()*37),n=ORD[idx],w0=wa,wf=w0-T2*3-Math.random()*2;
+  var target=wf+idx*STEP-PI/2,t0=performance.now(),T=5500;
+  (function frame(now){
+    var t=Math.min(1,(now-t0)/T),e=1-Math.pow(1-t,3);
+    wa=w0+(wf-w0)*e;
+    var b=target+(1-e)*(-T2*8);
+    if(t>.8){var pc=wa+idx*STEP-PI/2,k=(t-.8)/.2;b=pc+(b-pc)*(1-k)}
+    ba=b;br=t<.6?.93:.93-.21*Math.min(1,(t-.6)/.3);
+    drawR();
+    if(t<1)requestAnimationFrame(frame);else{
+      var col=n===0?'g':REDS.indexOf(n)>-1?'r':'b',w=0;
+      if(pick==='n'){if(n===num)w=bet*36}
+      else if(n!==0){if(pick===col)w=bet*2;else if(pick==='e'&&n%2===0)w=bet*2;else if(pick==='o'&&n%2===1)w=bet*2}
+      var r=$('rres');r.textContent='Выпало '+n;r.style.color=n===0?'#4ee39b':col==='r'?'#ff5a72':'#cfc8e0';
+      done(w,bet,w?'Угадал! +'+fmt(w):'Мимо…');lock(false);
+    }
+  })(t0);
+}
+document.querySelectorAll('[data-b]').forEach(function(b){b.onclick=function(){rouletteSpin(b.dataset.b)}});
+
+/* КОЛЕСО ФОРТУНЫ */
+var FS=[0,0.5,1.5,0,2,0,0.5,3,0,1,5,0],frot=0,fc=$('fc').getContext('2d');fc.scale(640/300,640/300);
+(function(){
+  for(var i=0;i<12;i++){
+    var m=FS[i],a=i*T2/12-PI/2;
+    fc.beginPath();fc.moveTo(150,150);fc.arc(150,150,150,a,a+T2/12);fc.closePath();
+    fc.fillStyle=m===0?'#241638':m<1?'#5a2a7a':m<3?'#2f6f5a':'#c48f22';fc.fill();fc.strokeStyle='#f5c451';fc.lineWidth=2;fc.stroke();
+    fc.save();fc.translate(150,150);fc.rotate(a+T2/24);fc.translate(105,0);fc.rotate(PI/2);
+    fc.fillStyle='#fff';fc.font='bold 22px Inter,sans-serif';fc.textAlign='center';fc.fillText(m===0?'✖':'×'+m,0,6);fc.restore();
+  }
+})();
+$('fbtn').onclick=function(){
+  if(busy||!take())return;lock(true);
+  var bet=st.bet,i=Math.floor(Math.random()*12),c=(i+.5)*30,cv=$('fc');
+  frot+=360*5+(((-c-frot)%360)+360)%360;cv.style.transform='rotate('+frot+'deg)';
+  setTimeout(function(){var w=Math.floor(bet*FS[i]);done(w,bet,w?'×'+FS[i]+'! '+(w>bet?'+':'')+fmt(w):'Пусто… ✖');lock(false)},4700);
+};
+
+/* АПГРЕЙДЕР */
+var UM=[1.5,2,3,5,10],um=2;
+function upShow(){
+  var ch=Math.min(95,95/um);
+  $('ring').style.background='conic-gradient(#1fbf75 0 '+ch+'%,#2a1b40 '+ch+'% 100%)';
+  $('upt').innerHTML='<div>'+ch.toFixed(1)+'%<small>шанс · ×'+um+'</small></div>';
+  document.querySelectorAll('#mults .chip').forEach(function(c){c.classList.toggle('on',+c.dataset.m===um)});
+}
+UM.forEach(function(m){
+  var b=document.createElement('button');b.className='chip';b.dataset.m=m;b.textContent='×'+m;
+  b.onclick=function(){if(!busy){um=m;upShow()}};$('mults').appendChild(b);
+});
+upShow();
+$('upbtn').onclick=function(){
+  if(busy||!take())return;lock(true);
+  var bet=st.bet,ch=Math.min(95,95/um),r=Math.random()*100,a=$('arr');
+  a.style.transition='none';a.style.transform='rotate(0deg)';void a.offsetWidth;
+  a.style.transition='transform 4s cubic-bezier(.15,.7,.1,1)';a.style.transform='rotate('+(360*5+r*3.6)+'deg)';
+  setTimeout(function(){
+    var w=r<ch?Math.floor(bet*um):0;
+    done(w,bet,w?'Апгрейд удался! +'+fmt(w):'Апгрейд сгорел 🔥');lock(false);
+  },4200);
+};
+
+/* КАРТЫ */
+function rc(){return{r:1+Math.floor(Math.random()*13),s:'♠♥♦♣'.charAt(Math.floor(Math.random()*4))}}
+function lab(r){return r===1?'A':r>10?'JQK'.charAt(r-11):r}
+function cardH(c,hide){return hide?'<div class="pc back"></div>':'<div class="pc'+(c.s==='♥'||c.s==='♦'?' rd':'')+'">'+lab(c.r)+'<b>'+c.s+'</b></div>'}
+
+/* БЛЭКДЖЕК */
+var bj={on:false,bet:0,p:[],d:[]};
+function tot(h){var t=0,a=0;h.forEach(function(c){t+=c.r>10?10:c.r===1?11:c.r;if(c.r===1)a++});while(t>21&&a>0){t-=10;a--}return t}
+function bjDraw(hide){
+  $('bjp').innerHTML=bj.p.map(function(c){return cardH(c)}).join('');
+  $('bjd').innerHTML=bj.d.map(function(c,i){return cardH(c,hide&&i===1)}).join('');
+  $('bjpt').textContent=tot(bj.p);$('bjdt').textContent=hide?'?':tot(bj.d);
+}
+function bjUi(){$('bjH').disabled=$('bjS').disabled=$('bjD').disabled=!bj.on}
+function bjFinish(){
+  bj.on=false;bjUi();bjDraw(false);
+  var pt=tot(bj.p),dt=tot(bj.d),b=bj.bet,w=0,tx;
+  var nat=bj.p.length===2&&pt===21,dnat=bj.d.length===2&&dt===21;
+  if(pt>21){tx='Перебор! Дилер забрал ставку'}
+  else if(nat&&!dnat){w=Math.floor(b*2.5);tx='БЛЭКДЖЕК! +'+fmt(w)}
+  else if(dt>21||pt>dt){w=b*2;tx='Дилер проиграл! +'+fmt(w)}
+  else if(pt===dt){w=b;tx='Ничья — ставка вернулась'}
+  else tx='Дилер-бот выиграл ('+dt+' против '+pt+')';
+  done(w,b,tx);lock(false);
+}
+function bjDealer(){
+  bjDraw(false);
+  if(tot(bj.d)<17){say('Дилер-бот берёт карту…');setTimeout(function(){bj.d.push(rc());bjDealer()},700)}
+  else bjFinish();
+}
+function bjStand(){bj.on=false;bjUi();bjDealer()}
+bjUi();
+$('bjdeal').onclick=function(){
+  if(busy||!take())return;lock(true);
+  bj={on:true,bet:st.bet,p:[rc(),rc()],d:[rc(),rc()]};bjDraw(true);bjUi();
+  if(tot(bj.p)===21)bjStand();
+};
+$('bjH').onclick=function(){bj.p.push(rc());bjDraw(true);if(tot(bj.p)>21)bjFinish();else if(tot(bj.p)===21)bjStand()};
+$('bjS').onclick=bjStand;
+$('bjD').onclick=function(){
+  if(st.money<bj.bet){say('Не хватает денег на удвоение','lose');return}
+  st.money-=bj.bet;bj.bet*=2;render();bj.p.push(rc());bjDraw(true);
+  if(tot(bj.p)>21)bjFinish();else bjStand();
+};
+
+/* ДУЭЛЬ С БОТОМ */
+var du={on:false,bet:0,me:null,bot:null,myIn:0,botIn:0,raised:false},botBank=5000;
+var TAUNT=['Бот Виктор: «Я чувствую твой страх…»','Бот Виктор: «Моя карта — огонь 🔥»','Бот Виктор: «Ты точно уверен?»','Бот Виктор: «Я не блефую. Почти.»'];
+var dv=function(c){return c.r===1?14:c.r};
+function duelDraw(rev){
+  $('dme').innerHTML=cardH(du.me);$('dbot').innerHTML=cardH(du.bot,!rev);$('bbank').textContent=fmt(botBank);
+}
+function duelUi(){$('dS').disabled=$('dF').disabled=!du.on;$('dR').disabled=!du.on||du.raised}
+function duelEnd(){du.on=false;duelUi();duelDraw(true);lock(false)}
+function duelResolve(){
+  var m=dv(du.me),o=dv(du.bot),pot=du.myIn+du.botIn;
+  if(m>o){duelEnd();done(pot,du.myIn,'Ты обыграл бота! +'+fmt(pot-du.myIn))}
+  else if(m<o){botBank+=pot;duelEnd();done(0,du.myIn,'Бот Виктор выиграл банк '+fmt(pot))}
+  else{botBank+=du.botIn;duelEnd();done(du.myIn,du.myIn,'Ничья — ставки вернулись')}
+}
+duelUi();
+$('ddeal').onclick=function(){
+  if(busy||!take())return;lock(true);
+  var b=st.bet;if(botBank<b)botBank=5000;botBank-=b;
+  du={on:true,bet:b,me:rc(),bot:rc(),myIn:b,botIn:b,raised:false};
+  duelDraw(false);duelUi();say(rnd(TAUNT));
+};
+$('dS').onclick=duelResolve;
+$('dF').onclick=function(){
+  var back=Math.floor(du.myIn/2);botBank+=du.myIn-back+du.botIn;
+  duelEnd();done(back,du.myIn,'Ты сбросил карты — вернулась половина ставки');
+};
+$('dR').onclick=function(){
+  if(st.money<du.bet){say('Не хватает денег на повышение','lose');return}
+  st.money-=du.bet;du.myIn+=du.bet;du.raised=true;render();
+  if(dv(du.bot)<8&&Math.random()<.75){
+    var pot=du.myIn+du.botIn;duelEnd();done(pot,du.myIn,'Бот испугался и сбросил! +'+fmt(pot-du.myIn));
+  }else{
+    if(botBank<du.bet)botBank=5000;botBank-=du.bet;du.botIn+=du.bet;say('Бот принял повышение!');
+    setTimeout(duelResolve,700);duelUi();
+  }
+};
+
+/* ДУРАК (старая версия отключена) */
+if(false){
+var D={on:false,wait:false,deck:[],trump:'',me:[],bot:[],table:[],att:'me',bet:0,cap:6};
+function dkDeck(){var d=[];for(var s=0;s<4;s++)for(var r=6;r<=14;r++)d.push({r:r,s:'♠♥♦♣'.charAt(s)});for(var i=d.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1)),t=d[i];d[i]=d[j];d[j]=t}return d}
+function beats(a,d){return d.s===a.s?d.r>a.r:d.s===D.trump}
+function dkHtml(c,i,ok){return cardH({r:c.r===14?1:c.r,s:c.s}).replace('class="pc','data-i="'+i+'" class="pc'+(ok?' ok':''))}
+function dkSort(a,b){return (a.s===D.trump)*100+a.r-(b.s===D.trump)*100-b.r}
+function dkOk(c){
+  if(!D.on||D.wait)return false;
+  if(D.att==='me')return D.table.length<D.cap&&(D.table.length===0||D.table.some(function(p){return p.a.r===c.r||(p.d&&p.d.r===c.r)}));
+  var p=D.table.filter(function(p){return !p.d})[0];return !!p&&beats(p.a,c);
+}
+function dkRender(){
+  $('dkb').textContent=D.bot.length;$('dkd').textContent=D.deck.length;$('dkt').textContent=D.trump;
+  $('dkt').style.color=(D.trump==='♥'||D.trump==='♦')?'#ff5a72':'#fff';
+  $('dkbot').innerHTML=D.bot.map(function(){return cardH(0,true)}).join('');
+  $('dktab').innerHTML=D.table.map(function(p){return '<div class="pair">'+dkHtml(p.a,-1)+(p.d?dkHtml(p.d,-1):'')+'</div>'}).join('');
+  $('dkme').innerHTML=D.me.map(function(c,i){return dkHtml(c,i,dkOk(c))}).join('');
+  var und=D.table.some(function(p){return !p.d});
+  $('dkTake').disabled=!(D.on&&!D.wait&&D.att==='bot'&&und);
+  $('dkEnd').disabled=!(D.on&&!D.wait&&D.att==='me'&&D.table.length>0&&!und);
+}
+function dkOver(){
+  D.on=false;D.wait=false;dkRender();
+  var b=D.bet,m0=D.me.length===0,b0=D.bot.length===0;
+  if(m0&&b0)done(b,b,'Ничья — ставка вернулась');
+  else if(m0)done(b*2,b,'Ты выиграл! Бот — дурак 🤡 +'+fmt(b*2));
+  else done(0,b,'Ты остался в дураках 🤡');
+  lock(false);
+}
+function dkEndTurn(took){
+  D.table=[];var a=D.att,d=a==='me'?'bot':'me';
+  [a,d].forEach(function(k){while(D[k].length<6&&D.deck.length)D[k].push(D.deck.pop())});
+  if(!took)D.att=d;
+  var nd=D.att==='me'?'bot':'me';D.cap=Math.min(6,D[nd].length);D.wait=false;
+  if(D.deck.length===0&&(D.me.length===0||D.bot.length===0))return dkOver();
+  if(D.att==='bot'){D.wait=true;say('Атакует бот…');dkRender();setTimeout(dkBotAtt,800)}
+  else{say('Твой ход: выбери подсвеченную карту для атаки');dkRender()}
+}
+function dkBotAtt(){
+  var ranks=[];D.table.forEach(function(p){ranks.push(p.a.r);if(p.d)ranks.push(p.d.r)});
+  var opts=D.bot.filter(function(c){return D.table.length===0||(ranks.indexOf(c.r)>-1&&c.s!==D.trump)}).sort(dkSort);
+  if(!opts.length||D.table.length>=D.cap){say('Бот: «Бито»');return dkEndTurn(false)}
+  var c=opts[0];D.bot.splice(D.bot.indexOf(c),1);D.table.push({a:c,d:null});D.wait=false;
+  say('Бот атакует. Побей подсвеченной картой или нажми «Беру»');dkRender();
+}
+function dkBotDef(){
+  var p=D.table.filter(function(p){return !p.d})[0];
+  var opts=D.bot.filter(function(c){return beats(p.a,c)}).sort(dkSort);
+  if(!opts.length){
+    D.table.forEach(function(q){D.bot.push(q.a);if(q.d)D.bot.push(q.d)});D.table=[];
+    say('Бот берёт карты 😈');dkRender();return setTimeout(function(){dkEndTurn(true)},700);
+  }
+  p.d=opts[0];D.bot.splice(D.bot.indexOf(opts[0]),1);
+  if(D.deck.length===0&&(D.bot.length===0||D.me.length===0)){dkRender();return setTimeout(function(){dkEndTurn(false)},700)}
+  D.wait=false;say('Бот отбился. Подкинь карту того же достоинства или нажми «Бито»');dkRender();
+}
+function dkPlay(i){
+  var c=D.me[i];if(!c||!dkOk(c))return;
+  if(D.att==='me'){D.table.push({a:c,d:null});D.me.splice(i,1);D.wait=true;dkRender();say('Бот думает…');setTimeout(dkBotDef,700)}
+  else{
+    D.table.filter(function(p){return !p.d})[0].d=c;D.me.splice(i,1);D.wait=true;dkRender();
+    if(D.me.length===0&&D.deck.length===0)return setTimeout(function(){dkEndTurn(false)},600);
+    setTimeout(dkBotAtt,700);
+  }
+}
+$('dkme').onclick=function(e){var el=e.target.closest('.pc');if(el&&el.dataset.i!==undefined)dkPlay(+el.dataset.i)};
+$('dkTake').onclick=function(){
+  D.table.forEach(function(p){D.me.push(p.a);if(p.d)D.me.push(p.d)});D.table=[];
+  say('Ты взял карты');dkEndTurn(true);
+};
+$('dkEnd').onclick=function(){dkEndTurn(false)};
+$('dkdeal').onclick=function(){
+  if(busy||!take())return;lock(true);
+  var d=dkDeck();
+  D={on:true,wait:false,deck:d,trump:d[0].s,me:[],bot:[],table:[],att:'me',bet:st.bet,cap:6};
+  for(var i=0;i<6;i++){D.me.push(D.deck.pop());D.bot.push(D.deck.pop())}
+  var lo=function(h){var t=h.filter(function(c){return c.s===D.trump}).map(function(c){return c.r});return t.length?Math.min.apply(null,t):99};
+  var a=lo(D.me),b=lo(D.bot);D.att=(a<b||(a===b&&Math.random()<.5))?'me':'bot';
+  if(D.att==='bot'){D.wait=true;say('Бот ходит первым: у него младший козырь');dkRender();setTimeout(dkBotAtt,900)}
+  else{say('Ты ходишь первым: выбери подсвеченную карту');dkRender()}
+};
+dkRender();
+
+}
+/* ДУРАК v2: 2–5 игроков, умные боты */
+var P=[],DN=3,BN=['Дмитрий','Алиса','Макс','Вика'],NL=['2 игрока','3 игрока','4 игрока','5 игроков'];
+var D={on:false,wait:false,deck:[],table:[],trump:'',ph:'add',adders:[0],ai:0,att:0,def:1,cap:6,bet:0};
+TUT.durak='<li>Выбери, сколько игроков: ты и боты (2–5).</li><li>У каждого по 6 карт, одна масть — козырь, он бьёт любую обычную масть. Ходит тот, у кого младший козырь.</li><li>Атакуешь: нажми на подсвеченную карту. Защитник должен побить её старшей картой той же масти или козырем.</li><li>Тебя атакуют: побей подсвеченной картой или нажми «Беру».</li><li>Когда все карты побиты, игроки по очереди могут подкинуть карты того же достоинства. Не хочешь — «Бито / Пас».</li><li>Кто первым избавился от карт при пустой колоде — вышел и выиграл. Последний с картами — дурак и теряет ставку.</li><li>Боты умеют беречь козыри и подкидывать карты. Если защитник берёт карты, подкидывать ему нельзя.</li>';
+function kDeck(){var d=[];for(var s=0;s<4;s++)for(var r=6;r<=14;r++)d.push({r:r,s:'♠♥♦♣'.charAt(s)});for(var i=d.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1)),t=d[i];d[i]=d[j];d[j]=t}return d}
+function kTr(c){return c.s===D.trump}
+function kBeats(a,d){return d.s===a.s?d.r>a.r:d.s===D.trump}
+function kCost(c){return c.r+(kTr(c)?100:0)}
+function kNext(i){var j=(i+1)%DN,n=0;while(P[j].hand.length===0&&n++<DN)j=(j+1)%DN;return j}
+function kHtml(c,i,ok){return cardH({r:c.r===14?1:c.r,s:c.s}).replace('class="pc','data-i="'+i+'" class="pc'+(ok?' ok':''))}
+function kRanks(){var r=[];D.table.forEach(function(p){r.push(p.a.r);if(p.d)r.push(p.d.r)});return r}
+function kUnd(){return D.table.filter(function(p){return !p.d})}
+function kCanAdd(c){return D.table.length===0||(D.table.length<D.cap&&kRanks().indexOf(c.r)>-1)}
+function kOk(c){if(!D.on||D.wait)return false;if(D.ph==='def')return D.def===0&&kBeats(kUnd()[0].a,c);return D.adders[D.ai]===0&&kCanAdd(c)}
+function kRender(){
+  $('dkd').textContent=D.deck.length;$('dkt').textContent=D.trump;
+  $('dkt').style.color=(D.trump==='♥'||D.trump==='♦')?'#ff5a72':'#fff';
+  $('dkbot').innerHTML=P.slice(1).map(function(p,i){var k=i+1;return '<div class="bt'+(D.on&&D.att===k?' atk':'')+(D.on&&D.def===k?' dfn':'')+'"><b>'+p.name+'</b><br>'+(D.on&&D.att===k?'⚔ ':'')+(D.on&&D.def===k?'🛡 ':'')+'🃏×'+p.hand.length+'</div>'}).join('');
+  $('dktab').innerHTML=D.table.map(function(p){return '<div class="pair">'+kHtml(p.a,-1)+(p.d?kHtml(p.d,-1):'')+'</div>'}).join('');
+  $('dkme').innerHTML=(P[0]?P[0].hand:[]).map(function(c,i){return kHtml(c,i,kOk(c))}).join('');
+  var w=D.on&&!D.wait;
+  $('dkTake').disabled=!(w&&D.ph==='def'&&D.def===0);
+  $('dkEnd').disabled=!(w&&D.ph==='add'&&D.adders[D.ai]===0&&D.table.length>0);
+}
+function kStartTurn(){
+  D.def=kNext(D.att);D.table=[];D.cap=Math.min(6,P[D.def].hand.length);D.adders=[];
+  for(var k=0;k<DN;k++){var q=(D.att+k)%DN;if(q!==D.def&&P[q].hand.length)D.adders.push(q)}
+  D.ph='add';D.ai=0;D.wait=false;kLoop();
+}
+function kLoop(){
+  if(!D.on)return;
+  if(D.ph==='def'){
+    if(D.def===0){D.wait=false;kRender();say('Побей подсвеченной картой или нажми «Беру»');return}
+    D.wait=true;kRender();say(P[D.def].name+' защищается…');setTimeout(kBotDef,800);return;
+  }
+  var q=D.adders[D.ai];
+  if(q===undefined)return kEndTurn(false);
+  if(q===0){
+    if(D.table.length&&!P[0].hand.some(kCanAdd)){D.ai++;return kLoop()}
+    D.wait=false;kRender();say(D.table.length?'Подкинь карту того же достоинства или нажми «Пас»':'Твой ход: выбери карту для атаки');return;
+  }
+  D.wait=true;kRender();if(!D.table.length)say(P[q].name+' ходит…');setTimeout(kBotAdd,800);
+}
+function kBotAdd(){
+  if(!D.on)return;
+  var q=D.adders[D.ai],h=P[q].hand,opts=h.filter(kCanAdd);
+  if(D.table.length){
+    opts=opts.filter(function(c){return !kTr(c)&&(c.r<=10||D.deck.length===0||P[D.def].hand.length<=2)});
+    if(Math.random()<.15)opts=[];
+  }
+  if(!opts.length){D.ai++;return kLoop()}
+  var key=function(c){return kCost(c)-3*(h.filter(function(x){return x.r===c.r}).length-1)};
+  opts.sort(function(a,b){return key(a)-key(b)});
+  var c=opts[0];h.splice(h.indexOf(c),1);D.table.push({a:c,d:null});D.ph='def';D.ai=0;kLoop();
+}
+function kBotDef(){
+  if(!D.on)return;
+  var u=kUnd()[0],h=P[D.def].hand;
+  var opts=h.filter(function(c){return kBeats(u.a,c)}).sort(function(a,b){return kCost(a)-kCost(b)});
+  var c=opts[0],tk=!c;
+  if(c&&kTr(c)&&!kTr(u.a)&&D.deck.length>4&&c.r>10&&u.a.r<10)tk=true;
+  if(tk)return kTake(D.def);
+  u.d=c;h.splice(h.indexOf(c),1);D.ph='add';D.ai=0;
+  if(h.length===0&&D.deck.length===0)return kEndTurn(false);
+  kLoop();
+}
+function kTake(i){
+  D.table.forEach(function(p){P[i].hand.push(p.a);if(p.d)P[i].hand.push(p.d)});
+  say((i?P[i].name+' берёт':'Ты берёшь')+' карты');kEndTurn(true);
+}
+function kEndTurn(took){
+  D.table=[];D.wait=true;
+  var order=[];for(var k=0;k<DN;k++){var q=(D.att+k)%DN;if(q!==D.def)order.push(q)}order.push(D.def);
+  order.forEach(function(q){var h=P[q].hand;while(h.length<6&&D.deck.length)h.push(D.deck.pop())});
+  if(kCheck())return;
+  D.att=took?kNext(D.def):(P[D.def].hand.length?D.def:kNext(D.def));
+  kRender();setTimeout(kStartTurn,800);
+}
+function kCheck(){
+  if(D.deck.length)return false;
+  var act=P.filter(function(p){return p.hand.length>0}).length;
+  if(P[0].hand.length===0){kOver(act===0&&DN===2?'draw':'win');return true}
+  if(act===1){kOver('lose');return true}
+  return false;
+}
+function kOver(r){
+  D.on=false;D.wait=false;kRender();
+  var b=D.bet,m=Math.floor(b*DN/(DN-1));
+  if(r==='draw')done(b,b,'Ничья — ставка вернулась');
+  else if(r==='win')done(m,b,'Ты вышел из игры — победа! +'+fmt(m-b));
+  else done(0,b,'Ты остался в дураках 🤡');
+  lock(false);
+}
+$('dkme').onclick=function(e){
+  var el=e.target.closest('.pc');if(!el||el.dataset.i===undefined)return;
+  var i=+el.dataset.i,c=P[0]&&P[0].hand[i];if(!c||!kOk(c))return;
+  P[0].hand.splice(i,1);
+  if(D.ph==='def'){kUnd()[0].d=c;D.ph='add';D.ai=0;D.wait=false;if(P[0].hand.length===0&&D.deck.length===0)return kEndTurn(false);kLoop()}
+  else{D.table.push({a:c,d:null});D.ph='def';D.ai=0;kLoop()}
+};
+$('dkTake').onclick=function(){if(D.on&&!D.wait&&D.ph==='def'&&D.def===0)kTake(0)};
+$('dkEnd').onclick=function(){if(D.on&&!D.wait&&D.ph==='add'&&D.adders[D.ai]===0&&D.table.length){D.ai++;kLoop()}};
+$('dkdeal').onclick=function(){
+  if(busy||!take())return;lock(true);
+  var d=kDeck();
+  D={on:true,wait:false,deck:d,trump:d[0].s,table:[],bet:st.bet,att:0,def:1,cap:6,ph:'add',adders:[0],ai:0};
+  P=[];for(var i=0;i<DN;i++)P.push({name:i?BN[i-1]:'Ты',hand:[]});
+  for(var k=0;k<6;k++)P.forEach(function(p){p.hand.push(D.deck.pop())});
+  var best=99,fi=0;P.forEach(function(p,i){p.hand.forEach(function(c){if(c.s===D.trump&&c.r<best){best=c.r;fi=i}})});
+  D.att=fi;say(fi?P[fi].name+' ходит первым (младший козырь)':'Ты ходишь первым (младший козырь)');
+  setTimeout(kStartTurn,700);kRender();
+};
+function kSel(){document.querySelectorAll('#dkN .chip').forEach(function(c){c.classList.toggle('on',+c.dataset.n===DN)})}
+[2,3,4,5].forEach(function(n){var b=document.createElement('button');b.className='chip';b.dataset.n=n;b.textContent=NL[n-2];b.onclick=function(){if(!busy){DN=n;kSel()}};$('dkN').appendChild(b)});
+kSel();kRender();
+
+/* бонус и сброс */
+var cd=0;
+$('bonus').onclick=function(){
+  if(cd>0)return;
+  st.money+=500;flash();say('+$500 бонус!','win');render();
+  cd=20;var b=$('bonus');b.disabled=true;b.textContent='🎁 Через '+cd+' с';
+  var t=setInterval(function(){cd--;b.textContent=cd>0?'🎁 Через '+cd+' с':'🎁 Бонус +500';if(cd<=0){clearInterval(t);b.disabled=false}},1000);
+};
+$('reset').onclick=function(){if(busy)return;st.money=START;st.best=START;st.bet=50;botBank=5000;say('Игра сброшена','lose');render()};
+
+$('money').textContent=fmt(st.money);render();
+})();
+</script>
+</body>
+</html>
