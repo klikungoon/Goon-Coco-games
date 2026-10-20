@@ -7,5 +7,14 @@
     "desc_en": "Virtual-money casino: slots, roulette, durak and more",
     "path": "games/casino/",
     "color": "#f5a524"
+  },
+  {
+    "title": "Peel the Bamboo",
+    "emoji": "🎋",
+    "desc": "Очищай бамбук",
+    "title_en": "Peel the Bamboo",
+    "desc_en": "Peel the bamboo",
+    "path": "games/peel-the-bamboo/peel-the-bamboo.html",
+    "color": "#4caf50"
   }
 ]
