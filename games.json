@@ -5,7 +5,7 @@
     "desc": "Казино на виртуальные деньги: слоты, рулетка, дурак и другие игры",
     "title_en": "Golden Royale",
     "desc_en": "Virtual-money casino: slots, roulette, durak and more",
-    "path": "games/casino/",
+    "path": "games/casino/index.html",
     "color": "#f5a524"
   },
   {
