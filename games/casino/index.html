@@ -205,6 +205,29 @@ h1{animation:glow 2.5s infinite alternate}
 <script>
 (function(){
 var START=1000,BETS=[10,50,100,500,1000],PI=Math.PI,T2=PI*2;
+var LANG=(function(){try{var l=localStorage.getItem('lang');if(l)return l}catch(e){}return /^ru/.test(navigator.language||'ru')?'ru':'en'})();
+var DICT={'Виртуальное казино':'Virtual casino','казино-симулятор':'casino simulator','Все игры':'All games','Баланс':'Balance','Рекорд':'Best','Слоты':'Slots','Рулетка':'Roulette','Фортуна':'Fortune','Апгрейдер':'Upgrader','Дуэль':'Duel','Дурак':'Durak','ВА-БАНК':'ALL IN','Как играть':'How to play','КРУТИТЬ КОЛЕСО':'SPIN THE WHEEL','КРУТИТЬ':'SPIN','АПГРЕЙД':'UPGRADE','РАЗДАТЬ':'DEAL','Ещё':'Hit','Хватит':'Stand','Удвоить':'Double','Вскрыть':'Reveal','Поднять':'Raise','Сбросить игру':'Reset game','Сбросить':'Fold','Беру':'Take','Бито / Пас':'Done / Pass','Красное':'Red','Чёрное':'Black','Нечёт':'Odd','Чёт':'Even','Поставить на число':'Bet on number','Бонус':'Bonus','Через':'Wait','Дилер-бот Макс':'Dealer bot Max','Бот Виктор':'Bot Victor','Ты ·':'You ·','Твоя карта':'Your card','Колода':'Deck','козырь':'trump','выиграл банк':'won the pot','Дмитрий':'Dmitry','Алиса':'Alice','Макс':'Max','Вика':'Vicky','игрока':'players','игроков':'players','3 в ряд':'3 in a row','любые 2 одинаковых':'any 2 matching','Блэкджек платит':'Blackjack pays','дилер берёт до 17':'dealer draws to 17','Выигрыш = ставка × число на секторе':'Win = bet × sector number','Чем больше множитель — тем меньше шанс попасть в зелёный сектор':'Bigger multiplier = smaller chance to hit the green sector','Старшая карта побеждает (туз — старший). Поднимешь ставку — бот может испугаться и сбросить!':'Higher card wins (ace is highest). Raise the bet - the bot may get scared and fold!','Выигрывает тот, кто первым избавится от карт. Подсвеченные карты — ими можно ходить.':'The first to get rid of all cards wins. Highlighted cards are playable.','шанс':'chance','Не хватает денег — уменьши ставку или возьми бонус':'Not enough money - lower the bet or take a bonus','Не хватает денег на удвоение':'Not enough money to double','Не хватает денег на повышение':'Not enough money to raise','Не повезло… попробуй ещё':'No luck... try again','ДЖЕКПОТ!':'JACKPOT!','Выигрыш':'Win','Угадал!':'Nice!','Мимо…':'Miss...','Выпало':'Landed on','Пусто…':'Empty...','Апгрейд удался!':'Upgrade success!','Апгрейд сгорел':'Upgrade burned','Перебор! Дилер забрал ставку':'Bust! Dealer takes the bet','БЛЭКДЖЕК!':'BLACKJACK!','Дилер проиграл!':'Dealer lost!','Ничья — ставка вернулась':'Push - bet returned','Ничья — ставки вернулись':'Push - bets returned','Дилер-бот выиграл':'Dealer bot wins','против':'vs','Дилер-бот берёт карту…':'Dealer bot draws...','Я чувствую твой страх…':'I can smell your fear...','Моя карта — огонь':'My card is fire','Ты точно уверен?':'Are you sure?','Я не блефую. Почти.':'I never bluff. Almost.','Ты обыграл бота!':'You beat the bot!','Ты сбросил карты — вернулась половина ставки':'You folded - half of the bet returned','Бот испугался и сбросил!':'The bot got scared and folded!','Бот принял повышение!':'The bot called the raise!','Ты ходишь первым (младший козырь)':'You go first (lowest trump)',' ходит первым (младший козырь)':' goes first (lowest trump)','Побей подсвеченной картой или нажми «Беру»':'Beat with a highlighted card or press Take','Подкинь карту того же достоинства или нажми «Пас»':'Throw in a card of the same rank or press Pass','Твой ход: выбери карту для атаки':'Your turn: pick a card to attack with',' защищается…':' is defending...',' ходит…':' is moving...',' берёт карты':' takes the cards','Ты берёшь карты':'You take the cards','Ты вышел из игры — победа!':'You are out - victory!','Ты остался в дураках':'You are the durak','бонус!':'bonus!','Игра сброшена':'Game reset'};
+var TUT_EN={
+slots:'<li>Pick a bet with a chip.</li><li>Press SPIN.</li><li>Three matching symbols win big (sevens x100!), two matching pay x1.5.</li>',
+roul:'<li>Pick a bet.</li><li>Choose what to bet on: red, black, even or odd (pays x2), or type a number 0-36 (pays x36).</li><li>The ball spins and drops into a pocket. On zero all bets lose except the number 0.</li>',
+fort:'<li>Pick a bet.</li><li>Press SPIN THE WHEEL.</li><li>The pointer shows the sector: your bet is multiplied by its number. X means you lost.</li>',
+up:'<li>Pick a multiplier.</li><li>The bigger it is, the smaller the green sector.</li><li>Press UPGRADE: if the arrow stops in green you win bet x multiplier, otherwise the bet burns.</li>',
+bj:'<li>Goal: get 21 or beat the dealer without going over.</li><li>Cards 2-10 count as their number, J Q K are 10, ace is 1 or 11.</li><li>Hit takes a card, Stand stops, Double doubles the bet and gives one card.</li><li>The dealer draws until 17.</li>',
+duel:'<li>Press DEAL: you and the bot get one card, its card is hidden.</li><li>Reveal: the higher card takes the pot.</li><li>Raise x2 doubles the bet - a weak bot may fold. Fold returns half the bet.</li>',
+durak:'<li>Pick the number of players (you + bots, 2-5).</li><li>Everyone gets 6 cards; one suit is trump and beats any normal suit. The lowest trump goes first.</li><li>Attack: click a highlighted card. The defender must beat it with a higher card of the same suit or a trump.</li><li>When you are attacked, beat with a highlighted card or press Take.</li><li>When all cards are beaten, players may throw in cards of the same rank. Nothing to throw? Done / Pass.</li><li>With the deck empty, whoever gets rid of all cards first is out and wins. The last one holding cards is the durak and loses the bet.</li><li>If the defender takes, no throw-ins.</li>'};
+var KEYS=Object.keys(DICT).sort(function(a,b){return b.length-a.length});
+function LT(s){KEYS.forEach(function(k){if(s.indexOf(k)>-1)s=s.split(k).join(DICT[k])});return s}
+function trNode(n){var v=n.nodeValue,t=LT(v);if(t!==v)n.nodeValue=t}
+function trTree(r){var w=document.createTreeWalker(r,NodeFilter.SHOW_TEXT),n;while((n=w.nextNode()))trNode(n)}
+if(LANG==='en'){
+  document.documentElement.lang='en';document.title=LT(document.title);trTree(document.body);
+  new MutationObserver(function(ms){ms.forEach(function(m){if(m.type==='characterData')trNode(m.target);else m.addedNodes.forEach(function(a){if(a.nodeType===3)trNode(a);else trTree(a)})})}).observe(document.body,{childList:true,subtree:true,characterData:true});
+}
+var lb=document.createElement('button');lb.textContent=LANG==='en'?'🌐 RU':'🌐 EN';
+lb.style.cssText='position:fixed;top:8px;right:8px;z-index:9;padding:6px 10px;background:#000c;color:#f5c451;border:2px solid #f5c451;font:18px VT323,monospace;cursor:pointer';
+lb.onclick=function(){if(busy)return;try{localStorage.setItem('lang',LANG==='en'?'ru':'en')}catch(e){}location.reload()};
+document.body.appendChild(lb);
+
 var st={money:START,best:START,bet:50};
 try{var sv=JSON.parse(localStorage.getItem('goldenRoyale')||'null');if(sv&&typeof sv.money==='number')st=sv;}catch(e){}
 var $=function(i){return document.getElementById(i)},busy=false,shown=st.money;
@@ -662,14 +685,15 @@ $('dkdeal').onclick=function(){
 function kSel(){document.querySelectorAll('#dkN .chip').forEach(function(c){c.classList.toggle('on',+c.dataset.n===DN)})}
 [2,3,4,5].forEach(function(n){var b=document.createElement('button');b.className='chip';b.dataset.n=n;b.textContent=NL[n-2];b.onclick=function(){if(!busy){DN=n;kSel()}};$('dkN').appendChild(b)});
 kSel();kRender();
+if(LANG==='en'){Object.keys(TUT_EN).forEach(function(k){TUT[k]=TUT_EN[k]});tutShow(!$('tut').classList.contains('hidden'))}
 
 /* бонус и сброс */
 var cd=0;
 $('bonus').onclick=function(){
   if(cd>0)return;
   st.money+=500;flash();say('+$500 бонус!','win');render();
-  cd=20;var b=$('bonus');b.disabled=true;b.textContent='🎁 Через '+cd+' с';
-  var t=setInterval(function(){cd--;b.textContent=cd>0?'🎁 Через '+cd+' с':'🎁 Бонус +500';if(cd<=0){clearInterval(t);b.disabled=false}},1000);
+  cd=20;var b=$('bonus');b.disabled=true;b.textContent='🎁 Через '+cd+(LANG==='en'?'s':' с');
+  var t=setInterval(function(){cd--;b.textContent=cd>0?'🎁 Через '+cd+(LANG==='en'?'s':' с'):'🎁 Бонус +500';if(cd<=0){clearInterval(t);b.disabled=false}},1000);
 };
 $('reset').onclick=function(){if(busy)return;st.money=START;st.best=START;st.bet=50;botBank=5000;say('Игра сброшена','lose');render()};
 

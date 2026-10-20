@@ -3,8 +3,9 @@
     "title": "Golden Royale",
     "emoji": "🎰",
     "desc": "Казино на виртуальные деньги: слоты, рулетка, дурак и другие игры",
+    "title_en": "Golden Royale",
+    "desc_en": "Virtual-money casino: slots, roulette, durak and more",
     "path": "games/casino/",
-    "color": "#f5c451",
-    "new": true
+    "color": "#f5a524"
   }
 ]

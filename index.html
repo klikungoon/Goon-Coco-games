@@ -2,70 +2,93 @@
 <html lang="ru">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Мои игры</title>
 <style>
-:root{--bg:#fff8ec;--card:#fff;--text:#1d1b2e;--mut:#6d6a80;--line:#1d1b2e;color-scheme:light dark;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#14121f;--card:#1f1c30;--text:#f4f1ff;--mut:#a29fbd;--line:#000}}
 *{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,"Segoe UI",sans-serif;min-height:100vh}
-header{text-align:center;padding:48px 16px 20px}
-h1{margin:0;font-size:clamp(34px,8vw,64px);letter-spacing:-.02em}
-header p{color:var(--mut);margin:8px 0 20px;font-size:18px}
-#q{width:min(420px,100%);padding:14px 18px;font-size:17px;border:3px solid var(--line);border-radius:14px;background:var(--card);color:var(--text);outline:none}
-#q:focus{box-shadow:0 0 0 4px #f5c45177}
-main{max-width:1000px;margin:0 auto;padding:16px 16px 60px;display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:18px}
-.card{position:relative;display:flex;flex-direction:column;gap:6px;padding:20px;text-decoration:none;color:inherit;background:var(--card);border:3px solid var(--line);border-radius:20px;box-shadow:6px 6px 0 var(--c,#f5c451);transition:transform .15s,box-shadow .15s}
-.card:hover{transform:translate(-3px,-3px);box-shadow:9px 9px 0 var(--c,#f5c451)}
-.card:active{transform:translate(3px,3px);box-shadow:2px 2px 0 var(--c,#f5c451)}
-.em{font-size:56px;line-height:1.1}
-.card h2{margin:4px 0 0;font-size:22px}
-.card p{margin:0;color:var(--mut);font-size:15px;line-height:1.4}
-.new{position:absolute;top:12px;right:12px;background:var(--c,#f5c451);color:#1d1b2e;font-weight:800;font-size:12px;padding:3px 8px;border-radius:999px;border:2px solid var(--line)}
-.empty{grid-column:1/-1;text-align:center;color:var(--mut);padding:30px;line-height:1.6}
+body{margin:0;background:#0b0818;color:#fff;font-family:system-ui,-apple-system,"Segoe UI",sans-serif;min-height:100vh;overflow-x:hidden}
+.bg{position:fixed;inset:0;z-index:-1;background:radial-gradient(40% 40% at 20% 20%,#7c3aed66,transparent),radial-gradient(40% 40% at 80% 30%,#ec489966,transparent),radial-gradient(50% 50% at 50% 95%,#06b6d466,transparent),#0b0818;animation:drift 16s ease-in-out infinite alternate}
+@keyframes drift{to{filter:hue-rotate(70deg);transform:scale(1.2)}}
+.lng{position:fixed;top:14px;right:14px;z-index:5;padding:9px 16px;border-radius:999px;border:1px solid #ffffff44;background:#ffffff18;backdrop-filter:blur(10px);color:#fff;font:700 15px system-ui;cursor:pointer;transition:.2s}
+.lng:hover{background:#ffffff33;transform:scale(1.06)}
+header{text-align:center;padding:60px 16px 18px}
+.logo{width:110px;height:110px;margin:0 auto 14px;border-radius:50%;display:grid;place-items:center;font-size:60px;background:conic-gradient(from 0deg,#7c3aed,#ec4899,#06b6d4,#7c3aed);box-shadow:0 0 50px #ec489988;animation:fl 3s ease-in-out infinite alternate}
+.logo span{width:92px;height:92px;border-radius:50%;background:#0b0818;display:grid;place-items:center}
+@keyframes fl{from{transform:translateY(0) rotate(-4deg)}to{transform:translateY(-10px) rotate(4deg)}}
+h1{margin:0;font-size:clamp(38px,9vw,72px);letter-spacing:-.03em;background:linear-gradient(90deg,#a78bfa,#f472b6,#22d3ee,#a78bfa);background-size:300% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;animation:sh 6s linear infinite}
+@keyframes sh{to{background-position:300% 0}}
+.tag{color:#c4bde0;font-size:19px;margin:8px 0 34px}
+main{max-width:1100px;margin:0 auto;padding:0 16px 40px;display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:20px}
+.tile{position:relative;display:flex;flex-direction:column;justify-content:flex-end;min-height:230px;padding:22px;border-radius:24px;text-decoration:none;color:#fff;overflow:hidden;border:1px solid #ffffff33;background:linear-gradient(140deg,var(--c),color-mix(in srgb,var(--c),#000 55%));box-shadow:0 12px 40px #0006;transition:transform .15s ease-out,box-shadow .3s;animation:in .6s backwards;animation-delay:var(--d)}
+@keyframes in{from{opacity:0;translate:0 30px}}
+.tile:hover{box-shadow:0 20px 60px var(--c)}
+.tile:before{content:"";position:absolute;inset:0;background:linear-gradient(115deg,transparent 40%,#ffffff40 50%,transparent 60%);transform:translateX(-120%);transition:transform .8s}
+.tile:hover:before{transform:translateX(120%)}
+.big{position:absolute;top:14px;right:18px;font-size:100px;line-height:1;filter:drop-shadow(0 8px 12px #0006);animation:fl 3s ease-in-out infinite alternate}
+.tile h2{margin:0;font-size:27px;text-shadow:0 2px 6px #0006}
+.tile p{margin:6px 0 14px;font-size:15px;line-height:1.35;opacity:.92}
+.play{align-self:flex-start;padding:8px 18px;border-radius:999px;background:#fff;color:#111;font-weight:800;font-size:14px}
+.msg{grid-column:1/-1;text-align:center;color:#c4bde0;line-height:1.6;padding:30px}
+footer{text-align:center;color:#8b84a8;padding:20px 16px 50px;font-size:14px}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 </head>
 <body>
+<div class="bg"></div>
+<button class="lng" id="lng"></button>
 <header>
-  <h1>🎮 Мои игры</h1>
-  <p>Выбери игру и играй</p>
-  <input id="q" type="search" placeholder="Поиск игры…" autocomplete="off">
+  <div class="logo"><span>🎮</span></div>
+  <h1 id="h"></h1>
+  <div class="tag" id="tg"></div>
 </header>
 <main id="grid"></main>
+<footer id="ft"></footer>
 
 <script>
-var games=[];
-var grid=document.getElementById('grid');
+var T={
+  ru:{h:'Мои игры',tg:'игры и всякое разное',ft:'Сделано с любовью и немного с помощью Claude',play:'▶ Играть',err:'Не получилось загрузить список игр (games.json).<br>Открывай сайт по ссылке с GitHub Pages, а не двойным кликом по файлу.'},
+  en:{h:'My Games',tg:'games and other fun stuff',ft:'Made with love and a little help from Claude',play:'▶ Play',err:'Could not load the games list (games.json).<br>Open the site via the GitHub Pages link, not by double-clicking the file.'}
+};
+var lang;
+try{lang=localStorage.getItem('lang')}catch(e){}
+if(!lang)lang=/^ru/.test(navigator.language||'ru')?'ru':'en';
+var games=null,grid=document.getElementById('grid');
 
-function show(list){
-  grid.innerHTML='';
-  if(!list.length){
-    var e=document.createElement('div');e.className='empty';e.textContent='Ничего не найдено';grid.appendChild(e);return;
-  }
-  list.forEach(function(g){
+function setLang(l){
+  lang=l;try{localStorage.setItem('lang',l)}catch(e){}
+  var t=T[l];
+  document.documentElement.lang=l;document.title=t.h;
+  document.getElementById('h').textContent=t.h;
+  document.getElementById('tg').textContent=t.tg;
+  document.getElementById('ft').textContent=t.ft;
+  document.getElementById('lng').textContent=l==='ru'?'🌐 English':'🌐 Русский';
+  draw();
+}
+function draw(){
+  var t=T[lang];grid.innerHTML='';
+  if(games===null)return;
+  if(games===false){grid.innerHTML='<div class="msg">'+t.err+'</div>';return}
+  games.forEach(function(g,i){
     var a=document.createElement('a');
-    a.className='card';a.href=g.path;
-    a.style.setProperty('--c',g.color||'#f5c451');
-    if(g.new){var n=document.createElement('span');n.className='new';n.textContent='НОВОЕ';a.appendChild(n)}
-    var em=document.createElement('div');em.className='em';em.textContent=g.emoji||'🎲';
-    var h=document.createElement('h2');h.textContent=g.title;
-    var p=document.createElement('p');p.textContent=g.desc||'';
-    a.appendChild(em);a.appendChild(h);a.appendChild(p);
+    a.className='tile';a.href=g.path;
+    a.style.setProperty('--c',g.color||'#7c3aed');
+    a.style.setProperty('--d',i*70+'ms');
+    var e=document.createElement('div');e.className='big';e.textContent=g.emoji||'🎲';
+    var h=document.createElement('h2');h.textContent=(lang==='en'&&g.title_en)||g.title;
+    var p=document.createElement('p');p.textContent=(lang==='en'&&g.desc_en)||g.desc||'';
+    var b=document.createElement('span');b.className='play';b.textContent=t.play;
+    a.appendChild(e);a.appendChild(h);a.appendChild(p);a.appendChild(b);
+    a.addEventListener('mousemove',function(ev){
+      var r=a.getBoundingClientRect(),x=(ev.clientX-r.left)/r.width-.5,y=(ev.clientY-r.top)/r.height-.5;
+      a.style.transform='perspective(700px) rotateY('+x*12+'deg) rotateX('+(-y*12)+'deg) translateY(-4px)';
+    });
+    a.addEventListener('mouseleave',function(){a.style.transform=''});
     grid.appendChild(a);
   });
 }
-
-document.getElementById('q').addEventListener('input',function(e){
-  var t=e.target.value.toLowerCase().trim();
-  show(games.filter(function(g){return (g.title+' '+(g.desc||'')).toLowerCase().indexOf(t)>-1}));
-});
-
-fetch('games.json')
-  .then(function(r){return r.json()})
-  .then(function(list){games=list;show(games)})
-  .catch(function(){
-    grid.innerHTML='<div class="empty">Не получилось загрузить список игр (games.json).<br>Открывай сайт по ссылке с GitHub Pages — двойным кликом по файлу он не работает.</div>';
-  });
+document.getElementById('lng').onclick=function(){setLang(lang==='ru'?'en':'ru')};
+setLang(lang);
+fetch('games.json').then(function(r){return r.json()}).then(function(l){games=l;draw()}).catch(function(){games=false;draw()});
 </script>
 </body>
 </html>
