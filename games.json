@@ -16,7 +16,7 @@
     "desc_en": "Peel the bamboo",
     "path": "games/peel-the-bamboo/",
     "color": "#4caf50"
-  }
+  },
   {
     "title": "Что было раньше?",
     "emoji": "⏳",
@@ -26,3 +26,4 @@
     "path": "games/history-timeline/",
     "color": "#8b5cf6"
   }
+]
