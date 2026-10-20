@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link href="https://fonts.googleapis.com/css2?family=Bungee&display=swap" rel="stylesheet">
+<title>Что было раньше?</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#0b0818;color:#fff;font-family:system-ui,-apple-system,"Segoe UI",sans-serif;min-height:100vh}
+.bg{position:fixed;inset:0;z-index:-1;background:radial-gradient(40% 40% at 20% 20%,#7c3aed66,transparent),radial-gradient(40% 40% at 80% 30%,#ec489966,transparent),radial-gradient(50% 50% at 50% 95%,#06b6d466,transparent),#0b0818;animation:drift 16s ease-in-out infinite alternate}
+@keyframes drift{to{filter:hue-rotate(70deg);transform:scale(1.2)}}
+.back,.lng{position:fixed;top:12px;z-index:5;padding:9px 14px;border-radius:999px;border:1px solid #ffffff44;background:#ffffff18;backdrop-filter:blur(10px);color:#fff;font:700 14px system-ui;cursor:pointer;text-decoration:none}
+.back{left:12px}.lng{right:12px}
+.back:hover,.lng:hover{background:#ffffff33}
+main{max-width:900px;margin:0 auto;padding:64px 16px 40px;text-align:center}
+h1{margin:0;font:400 clamp(30px,7vw,56px)/1.1 Bungee,Impact,sans-serif;text-shadow:3px 3px 0 #ec4899,6px 6px 0 #7c3aed}
+#sub{color:#d6d0ee;font-size:18px;margin:18px 0}
+.stats{display:flex;justify-content:center;gap:12px;margin:10px 0 22px;flex-wrap:wrap}
+.stats span{padding:8px 16px;border-radius:999px;background:#ffffff18;border:1px solid #ffffff33;font-weight:800}
+.cards{display:flex;gap:14px;align-items:stretch}
+.vs{align-self:center;font:400 24px Bungee,Impact,sans-serif;color:#f472b6}
+.card{flex:1;min-width:0;min-height:260px;padding:22px;border-radius:24px;border:2px solid #ffffff33;background:#ffffff14;backdrop-filter:blur(8px);color:#fff;font:inherit;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;transition:transform .2s,box-shadow .3s,border-color .3s,background .3s}
+.card:hover{transform:translateY(-6px) scale(1.02);border-color:#a78bfa;box-shadow:0 0 40px #7c3aed88}
+.card.ok{border-color:#22c55e;background:#22c55e30;box-shadow:0 0 40px #22c55e88}
+.card.bad{border-color:#ef4444;background:#ef444430;animation:shake .4s}
+@keyframes shake{25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}
+.em{font-size:64px;line-height:1}
+.tx{font-size:clamp(17px,3.4vw,22px);font-weight:700;line-height:1.25}
+.yr{font:400 28px Bungee,Impact,sans-serif;color:#fde68a;min-height:36px}
+.yr.rev{animation:pop .5s}
+@keyframes pop{from{transform:scale(.4);opacity:0}}
+.res{min-height:34px;margin:22px 0 10px;font-size:22px;font-weight:800}
+.res.ok{color:#4ade80}.res.bad{color:#f87171}
+.go{padding:14px 34px;border:0;border-radius:999px;background:linear-gradient(90deg,#7c3aed,#ec4899);color:#fff;font:800 18px system-ui;cursor:pointer;box-shadow:0 8px 24px #ec489955}
+.go:hover{filter:brightness(1.15)}
+@media (max-width:640px){.cards{flex-direction:column}.card{min-height:190px}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="bg"></div>
+<a class="back" id="back" href="../../"></a>
+<button class="lng" id="lng"></button>
+<main>
+  <h1 id="h"></h1>
+  <div id="sub"></div>
+  <div class="stats"><span id="st"></span><span id="bs"></span></div>
+  <div class="cards">
+    <button class="card" id="c0"><div class="em"></div><div class="tx"></div><div class="yr"></div></button>
+    <div class="vs">VS</div>
+    <button class="card" id="c1"><div class="em"></div><div class="tx"></div><div class="yr"></div></button>
+  </div>
+  <div class="res" id="res"></div>
+  <button class="go" id="next"></button>
+</main>
+
+<script>
+/* [год, эмодзи, по-русски, in English] — чтобы добавить событие, допиши строку */
+var EV=[
+[1889,'🎴','Основана компания Nintendo','Nintendo is founded'],
+[1889,'🗼','Построена Эйфелева башня','The Eiffel Tower is completed'],
+[1867,'🧨','Нобель патентует динамит','Nobel patents dynamite'],
+[1863,'🚇','Открыта первая линия метро (Лондон)','First metro line opens (London)'],
+[1917,'🚩','Революция 1917 года в России','Revolution of 1917 in Russia'],
+[1876,'☎️','Белл патентует телефон','Bell patents the telephone'],
+[1879,'💡','Эдисон создаёт практичную лампу накаливания','Edison makes a practical light bulb'],
+[1903,'✈️','Первый полёт братьев Райт','The Wright brothers’ first flight'],
+[1969,'🌕','Человек высаживается на Луну','Humans land on the Moon'],
+[1961,'🚀','Гагарин летит в космос','Gagarin flies to space'],
+[1957,'🛰️','Запущен первый спутник','The first satellite is launched'],
+[1455,'📖','Напечатана Библия Гутенберга','The Gutenberg Bible is printed'],
+[1492,'⛵','Колумб достигает Америки','Columbus reaches the Americas'],
+[1066,'⚔️','Битва при Гастингсе','Battle of Hastings'],
+[1789,'🥖','Начало Великой французской революции','The French Revolution begins'],
+[1776,'🗽','Декларация независимости США','US Declaration of Independence'],
+[1945,'🕊️','Конец Второй мировой войны','End of World War II'],
+[1989,'🧱','Падение Берлинской стены','The Berlin Wall falls'],
+[1991,'🏛️','Распад СССР','Dissolution of the USSR'],
+[1991,'🌐','Появляется первый сайт в интернете','The first website goes online'],
+[1971,'✉️','Отправлено первое электронное письмо','The first email is sent'],
+[1995,'🪟','Выходит Windows 95','Windows 95 is released'],
+[1998,'🔎','Основан Google','Google is founded'],
+[2004,'👍','Основан Facebook','Facebook is founded'],
+[2005,'▶️','Основан YouTube','YouTube is founded'],
+[2007,'📱','Выходит первый iPhone','The first iPhone is released'],
+[2009,'₿','Создан Bitcoin','Bitcoin is created'],
+[2001,'📚','Запущена Википедия','Wikipedia is launched'],
+[1985,'🍄','Выходит Super Mario Bros.','Super Mario Bros. is released'],
+[1972,'🏓','Выходит игра Pong','Pong is released'],
+[1984,'🧩','Создан Тетрис','Tetris is created'],
+[1994,'🎮','Выходит первая PlayStation','The first PlayStation is released'],
+[1996,'⚡','Выходят первые игры Pokémon','The first Pokémon games are released'],
+[1977,'🌌','Премьера «Звёздных войн»','Star Wars premieres'],
+[1937,'🍎','Премьера «Белоснежки» Диснея','Disney’s Snow White premieres'],
+[1928,'🐭','Дебют Микки Мауса','Mickey Mouse debuts'],
+[1927,'🎬','Первый звуковой полнометражный фильм','The first feature film with sound'],
+[1895,'🎞️','Первый публичный киносеанс братьев Люмьер','The Lumière brothers’ first public film screening'],
+[1896,'🥇','Первые современные Олимпийские игры','The first modern Olympic Games'],
+[1930,'⚽','Первый чемпионат мира по футболу','The first FIFA World Cup'],
+[1886,'🥤','Изобретена Coca-Cola','Coca-Cola is invented'],
+[1908,'🚗','Ford выпускает Model T','Ford launches the Model T'],
+[1886,'🚙','Бенц патентует первый автомобиль','Benz patents the first automobile'],
+[1825,'🚂','Открыта первая общественная железная дорога','The first public steam railway opens'],
+[1769,'⚙️','Уатт патентует улучшенную паровую машину','Watt patents his improved steam engine'],
+[1796,'💉','Дженнер делает первую прививку от оспы','Jenner gives the first smallpox vaccination'],
+[1928,'🧫','Флеминг открывает пенициллин','Fleming discovers penicillin'],
+[1953,'🧬','Открыта структура ДНК','The structure of DNA is discovered'],
+[1859,'🐒','Дарвин публикует «Происхождение видов»','Darwin publishes On the Origin of Species'],
+[1687,'🍏','Ньютон публикует «Начала»','Newton publishes the Principia'],
+[1543,'☀️','Коперник публикует гелиоцентрическую модель','Copernicus publishes his heliocentric model'],
+[1609,'🔭','Галилей направляет телескоп на небо','Galileo points a telescope at the sky'],
+[1812,'🐻','Бородинская битва','The Battle of Borodino'],
+[1703,'🏰','Основан Санкт-Петербург','Saint Petersburg is founded'],
+[1147,'🗺️','Первое упоминание Москвы','The first mention of Moscow'],
+[988,'⛪','Крещение Руси','The Baptism of Rus’'],
+[1861,'⛓️','Отмена крепостного права в России','Serfdom is abolished in Russia'],
+[1380,'🛡️','Куликовская битва','The Battle of Kulikovo'],
+[1799,'🪨','Найден Розеттский камень','The Rosetta Stone is found'],
+[1912,'🚢','Гибель «Титаника»','The Titanic sinks'],
+[1986,'☢️','Авария на Чернобыльской АЭС','The Chernobyl disaster'],
+[1914,'🔥','Начало Первой мировой войны','World War I begins'],
+[1865,'🐰','Выходит «Алиса в Стране чудес»','Alice’s Adventures in Wonderland is published'],
+[1883,'🌋','Извержение вулкана Кракатау','Krakatoa erupts'],
+[1851,'🎪','Первая Всемирная выставка в Лондоне','The first World’s Fair in London'],
+[1955,'🎡','Открывается Диснейленд','Disneyland opens'],
+[1911,'🐧','Амундсен достигает Южного полюса','Amundsen reaches the South Pole'],
+[1620,'🌊','«Мейфлауэр» приплывает в Америку','The Mayflower reaches America']
+];
+
+function yrs(n){var m=n%100,k=n%10;return (m>10&&m<20)?'лет':k===1?'год':(k>1&&k<5)?'года':'лет'}
+var T={
+  ru:{h:'Что было раньше?',sub:'Нажми на событие, которое произошло раньше',back:'← Все игры',streak:'Серия',best:'Рекорд',ok:'Верно!',bad:'Неверно!',next:'Дальше →',again:'Играть снова',
+      year:function(y){return y+' г.'},diff:function(d){return 'Разница: '+d+' '+yrs(d)}},
+  en:{h:'Which Came First?',sub:'Tap the event that happened earlier',back:'← All games',streak:'Streak',best:'Best',ok:'Correct!',bad:'Wrong!',next:'Next →',again:'Play again',
+      year:function(y){return String(y)},diff:function(d){return 'Difference: '+d+(d===1?' year':' years')}}
+};
+var $=function(i){return document.getElementById(i)};
+var cards=[$('c0'),$('c1')];
+var lang;try{lang=localStorage.getItem('lang')}catch(e){}
+if(!lang)lang=/^ru/.test(navigator.language||'ru')?'ru':'en';
+var best=0;try{best=+localStorage.getItem('histBest')||0}catch(e){}
+var streak=0,A,B,show=[false,false],res=null,locked=false,over=false;
+
+function mind(){return streak<3?150:streak<6?50:streak<10?15:2}
+function rnd(){return EV[Math.floor(Math.random()*EV.length)]}
+function pair(first){
+  var a=first||rnd(),b,t=0;
+  do{b=rnd();t++}while((b===a||Math.abs(b[0]-a[0])<(t>60?1:mind()))&&t<300);
+  return [a,b];
+}
+function paint(){
+  var t=T[lang];
+  document.documentElement.lang=lang;document.title=t.h;
+  $('h').textContent=t.h;$('sub').textContent=t.sub;$('back').textContent=t.back;
+  $('lng').textContent=lang==='ru'?'🌐 English':'🌐 Русский';
+  $('st').textContent='🔥 '+t.streak+': '+streak;$('bs').textContent='🏆 '+t.best+': '+best;
+  [A,B].forEach(function(e,i){
+    cards[i].querySelector('.em').textContent=e[1];
+    cards[i].querySelector('.tx').textContent=e[lang==='en'?3:2];
+    cards[i].querySelector('.yr').textContent=show[i]?t.year(e[0]):'???';
+  });
+  var r=$('res');
+  r.textContent=res?(res.ok?t.ok:t.bad)+' '+t.diff(res.d):'';
+  r.className='res'+(res?(res.ok?' ok':' bad'):'');
+  $('next').textContent=over?t.again:t.next;
+  $('next').style.display=res?'':'none';
+}
+function start(){
+  streak=0;over=false;res=null;locked=false;show=[false,false];
+  var p=pair();A=p[0];B=p[1];
+  cards.forEach(function(c){c.className='card'});
+  paint();
+}
+function choose(i){
+  if(locked)return;locked=true;
+  var ch=i?B:A,ot=i?A:B,ok=ch[0]<ot[0];
+  show=[true,true];res={ok:ok,d:Math.abs(A[0]-B[0])};
+  cards[A[0]<B[0]?0:1].classList.add('ok');
+  if(!ok){cards[i].classList.add('bad');over=true}
+  else{streak++;if(streak>best){best=streak;try{localStorage.setItem('histBest',best)}catch(e){}}}
+  paint();
+  cards.forEach(function(c){var y=c.querySelector('.yr');y.classList.remove('rev');void y.offsetWidth;y.classList.add('rev')});
+}
+function next(){
+  if(over){start();return}
+  var p=pair(B);A=B;B=p[1];
+  show=[true,false];res=null;locked=false;
+  cards.forEach(function(c){c.className='card'});
+  paint();
+}
+cards[0].onclick=function(){choose(0)};
+cards[1].onclick=function(){choose(1)};
+$('next').onclick=next;
+$('lng').onclick=function(){lang=lang==='ru'?'en':'ru';try{localStorage.setItem('lang',lang)}catch(e){}paint()};
+start();
+</script>
+</body>
+</html>
