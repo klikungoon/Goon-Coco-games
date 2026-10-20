@@ -18,3 +18,12 @@
     "color": "#4caf50"
   }
 ]
+  {
+    "title": "Что было раньше?",
+    "emoji": "⏳",
+    "desc": "Угадай, какое историческое событие произошло раньше, и собери длинную серию",
+    "title_en": "Which Came First?",
+    "desc_en": "Guess which historical event happened first and build a long streak",
+    "path": "games/history-timeline/",
+    "color": "#8b5cf6"
+  }
