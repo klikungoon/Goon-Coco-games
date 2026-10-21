@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 800">
+<defs><linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#210a3d"/><stop offset="1" stop-color="#5d2674"/></linearGradient></defs>
+<rect width="600" height="800" fill="url(#bg)"/>
+<circle cx="500" cy="100" r="90" fill="#d4af37" opacity=".12"/>
+<circle cx="80" cy="700" r="130" fill="#e8cf7a" opacity=".08"/>
+<circle cx="300" cy="360" r="135" fill="#b84936" stroke="#f4df91" stroke-width="10"/><path d="M205 300 Q260 270 320 310 T405 355 M215 405 Q280 365 355 420" fill="none" stroke="#e88966" stroke-width="24" stroke-linecap="round"/><rect x="125" y="145" width="350" height="55" rx="12" fill="#fff" opacity=".95"/><text x="300" y="183" fill="#28113e" font-family="Arial" font-size="28" font-weight="bold" text-anchor="middle">METRIC ≠ IMPERIAL</text>
+<text x="300" y="660" fill="#f4df91" font-family="Georgia,serif" font-size="34" font-weight="bold" text-anchor="middle">UNIT ERROR</text>
+<text x="300" y="710" fill="#ffffff" font-family="Georgia,serif" font-size="22" text-anchor="middle">Lost in translation.</text>
+</svg>
