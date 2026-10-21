@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Drop Dungeon – Gem Plinko</title>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
+<style>
+:root{color-scheme:dark;--bg:#120e1f;--panel:#2a2340;--panel2:#1a1530;--btn:#5b5280;--gold:#ff9a3c;--green:#3ddc97;--ink:#f1ead8;--mut:#9a8fc4;--red:#c0556b;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+*{box-sizing:border-box;image-rendering:pixelated}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);background-image:linear-gradient(#ffffff08 1px,transparent 1px),linear-gradient(90deg,#ffffff08 1px,transparent 1px);background-size:24px 24px;color:var(--ink);font-family:'VT323','Courier New',monospace;font-size:20px;display:flex;justify-content:center}
+.wrap{width:100%;max-width:640px;padding:16px 12px 32px}
+h1{font-family:'Press Start 2P',monospace;color:var(--gold);text-align:center;font-size:clamp(20px,6vw,34px);margin:8px 0 6px;text-shadow:3px 3px 0 #7a2e00}
+.sub{text-align:center;color:var(--mut);letter-spacing:6px;font-size:18px;margin-bottom:16px}
+.box{background:var(--panel);border:4px solid #0d0d12;box-shadow:inset 0 0 0 3px #3d3d4a;padding:14px}
+.bal{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:12px}
+.bal small{color:var(--mut);letter-spacing:3px;display:block}
+.bal b{font-family:'Press Start 2P',monospace;color:var(--gold);font-size:26px;font-weight:400;text-shadow:2px 2px 0 #7a2e00}
+.bal .best{text-align:right}.bal .best b{font-size:14px;color:var(--ink);text-shadow:none}
+button{font-family:inherit;font-size:20px;color:var(--ink);background:var(--btn);border:3px solid #0d0d12;box-shadow:inset 0 0 0 2px #8277b0,inset 0 -4px 0 #3f3860;padding:6px 12px;cursor:pointer;text-shadow:1px 1px 0 #000}
+button:hover{filter:brightness(1.12)}button:active{transform:translateY(2px)}
+button:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+button.on{background:var(--green);box-shadow:inset 0 0 0 2px #8af0c4,inset 0 -4px 0 #1f8f64;color:#fff}
+button:disabled{opacity:.45;cursor:not-allowed}
+.row{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;align-items:center;margin:8px 0}
+.lbl{width:100%;text-align:center;color:var(--mut);letter-spacing:3px;font-size:18px;margin-bottom:-2px}
+.felt{background:radial-gradient(circle at 50% 0%,#5a3d7a99,transparent 65%),repeating-linear-gradient(0deg,#00000022 0 2px,transparent 2px 28px),linear-gradient(#1f1838,#120d24);border:4px solid #0d0d12;box-shadow:inset 0 0 0 3px #3a2f5c;padding:10px;margin-top:12px}
+canvas{display:block;width:100%;height:auto;margin:0 auto}
+#go{width:100%;margin-top:10px;font-family:'Press Start 2P',monospace;font-size:16px;padding:16px;color:#2a1c00;background:linear-gradient(#ffc27a,#ff7a1f);box-shadow:inset 0 0 0 3px #ffe3c0,inset 0 -6px 0 #b24a00;text-shadow:none}
+.msg{text-align:center;color:var(--gold);min-height:28px;margin:12px 0 4px;font-size:24px}
+.hist{display:flex;gap:6px;justify-content:center;flex-wrap:wrap;min-height:30px}
+.hist span{padding:2px 8px;border:2px solid #0d0d12;font-size:20px}
+.w{background:#8a6a1c;color:var(--gold)}.l{background:#3b3b55;color:#a9a9d6}
+.bot{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+.bot button{padding:12px}
+.cost{color:var(--mut);text-align:center}
+.result{margin:12px 0;padding:12px;text-align:center;border:4px solid #0d0d12}
+.result[hidden]{display:none}
+.result.win{background:#1d4a38;box-shadow:inset 0 0 0 3px #3ddc97}
+.result.lose{background:#4a1d33;box-shadow:inset 0 0 0 3px #c0556b}
+.rt{letter-spacing:3px;color:var(--mut)}
+.rn{font-family:'Press Start 2P',monospace;font-size:26px;margin:8px 0}
+.win .rn{color:#3ddc97}.lose .rn{color:#ff7a9a}
+</style></head><body>
+<div class="wrap">
+<h1>DROP DUNGEON</h1><div class="sub">GEM PLINKO</div>
+<div class="box bal"><div><small>BALANCE</small><b id="bal">$1000</b></div><div class="best"><small>BEST</small><b id="best">$1000</b></div></div>
+<div class="box">
+<div class="row"><span class="lbl">BET PER BALL</span><span id="bets" class="row" style="margin:0"></span></div>
+<div class="row"><span class="lbl">RISK</span><span id="risks" class="row" style="margin:0"></span></div>
+<div class="row"><span class="lbl">ROWS</span><span id="rows" class="row" style="margin:0"></span></div>
+<div class="row"><span class="lbl">BALLS</span><span id="balls" class="row" style="margin:0"></span></div>
+<div class="cost" id="cost"></div>
+<div class="felt"><canvas id="c" width="560" height="500"></canvas></div>
+<button id="go">DROP</button>
+<div class="msg" id="msg">Pick your settings and drop a gem.</div>
+<div class="result" id="result" hidden></div>
+<div class="hist" id="hist"></div>
+<div class="bot"><button id="bonus">Bonus +$500</button><button id="reset">Reset game</button></div>
+</div></div>
+<script>
+const $=id=>document.getElementById(id);
+const cv=$('c'),ctx=cv.getContext('2d');
+const W=560;
+let S={bal:1000,best:1000,bet:100,risk:1,rows:12,balls:5};
+const RISKS=['Low','Medium','High'],EXP=[1.5,3,5],BETS=[10,50,100,500,1000],ROWS=[8,10,12,14,16],BALLS=[1,5,10,25];
+const GEMS=['#ff4f8b','#4fd8ff','#a6ff4f','#ffd23f'];
+let round=null;
+let balls=[],pegs=[],mults=[],flash={},geo={},queue=0,hist=[];
+
+function binom(n,k){let r=1;for(let i=1;i<=k;i++)r=r*(n-k+i)/i;return r}
+let distCache={};
+function simDist(){
+  const n=S.rows;if(distCache[n])return distCache[n];
+  const cnt=new Array(n+1).fill(0),N=300;
+  for(let t=0;t<N;t++){
+    const b={x:W/2+(Math.random()-.5)*geo.sx*.5,y:8,vx:(Math.random()-.5)*.6,vy:0};
+    while(b.y<geo.binY+6){
+      for(let s=0;s<2;s++){
+        b.vy+=0.12;b.x+=b.vx*0.5;b.y+=b.vy*0.5;
+        if(b.x<6){b.x=6;b.vx=Math.abs(b.vx)*.5}
+        if(b.x>W-6){b.x=W-6;b.vx=-Math.abs(b.vx)*.5}
+        if(b.y<geo.binY-8){for(const p of pegs){
+          const dx=b.x-p.x,dy=b.y-p.y;
+          if(Math.abs(dx)>10||Math.abs(dy)>10)continue;
+          const d=Math.hypot(dx,dy),R=8;
+          if(d<R&&d>0){const nx=dx/d,ny=dy/d,dot=b.vx*nx+b.vy*ny;b.x=p.x+nx*R;b.y=p.y+ny*R;
+            if(dot<0){b.vx-=1.55*dot*nx;b.vy-=1.55*dot*ny;b.vx+=(Math.random()-.5)*.5}b.vx*=.97;b.vy*=.97}
+        }}
+      }
+      if(b.vy>9)b.vy=9;
+    }
+    let k=Math.floor((b.x-geo.x0)/geo.sx);k=Math.max(0,Math.min(n,k));cnt[k]++;
+  }
+  const p=cnt.map(c=>(c+0.5)/(N+0.5*(n+1)));
+  return distCache[n]=p.map((v,k)=>(v+p[n-k])/2);
+}
+function calcMults(){
+  const n=S.rows,c=n/2,e=EXP[S.risk],P=simDist();let raw=[],ev=0;
+  for(let k=0;k<=n;k++){const d=Math.abs(k-c)/c;raw.push(Math.pow(1-d,e)+0.1);ev+=P[k]*raw[k]}
+  mults=raw.map(r=>Math.max(0.1,Math.round(r*0.92/ev*10)/10));
+}
+function build(){
+  const n=S.rows,sx=W/(n+2),sy=Math.min(30,420/n),top=36;
+  pegs=[];
+  for(let r=0;r<n;r++){const cnt=r+3,x0=W/2-(cnt-1)*sx/2;for(let i=0;i<cnt;i++)pegs.push({x:x0+i*sx,y:top+r*sy})}
+  const lastY=top+(n-1)*sy,binY=lastY+sy*0.9;
+  geo={sx,sy,top,binY,x0:W/2-(n+1)*sx/2,H:Math.round(binY+34)};
+  cv.height=geo.H;calcMults();
+}
+function fmt(m){return m>=100?Math.round(m):m.toFixed(1)}
+function binColor(m){return m>=10?'#ffd23f':m>=2?'#ff7a3c':m>=1?'#3ddc97':'#7a6ad8'}
+function draw(){
+  ctx.imageSmoothingEnabled=false;
+  ctx.clearRect(0,0,W,geo.H);
+  for(const p of pegs){const x=Math.round(p.x),y=Math.round(p.y);
+    ctx.fillStyle='#0d0d12';ctx.fillRect(x-4,y-4,8,8);
+    ctx.fillStyle='#6fd6e8';ctx.fillRect(x-3,y-3,6,6);
+    ctx.fillStyle='#e8ffff';ctx.fillRect(x-2,y-2,2,2);
+    ctx.fillStyle='#2a8fa8';ctx.fillRect(x,y+1,3,2)}
+  const n=S.rows,bw=geo.sx;
+  ctx.font=(n>12?'12px':'14px')+" 'Press Start 2P',monospace";ctx.textAlign='center';
+  for(let k=0;k<=n;k++){
+    const cx=geo.x0+k*bw+bw/2,f=flash[k]||0,y=geo.binY+(f>0?4:0);
+    ctx.fillStyle='#0d0d12';ctx.fillRect(cx-bw/2+1,y-1,bw-2,30);
+    ctx.fillStyle=binColor(mults[k]);ctx.globalAlpha=f>0?1:.82;
+    ctx.fillRect(cx-bw/2+3,y+1,bw-6,26);ctx.globalAlpha=1;
+    ctx.fillStyle='#1a1200';ctx.font=(n>12?'8px':'10px')+" 'Press Start 2P',monospace";
+    ctx.fillText(fmt(mults[k]),cx,y+19);
+  }
+  for(const k in flash)if(flash[k]>0)flash[k]--;
+  for(const b of balls){
+    const x=Math.round(b.x),y=Math.round(b.y);
+    for(let r=-6;r<=6;r+=2){const h=7-Math.abs(r);ctx.fillStyle='#0d0d12';ctx.fillRect(x-h-1,y+r-1,2*h+2,3)}
+    for(let r=-6;r<=6;r+=2){const h=7-Math.abs(r);ctx.fillStyle=GEMS[b.g];ctx.fillRect(x-h,y+r-1,2*h,2)}
+    ctx.fillStyle='#ffffffcc';ctx.fillRect(x-3,y-4,2,2);
+  }
+}
+function step(){
+  for(const b of balls){
+    for(let s=0;s<2;s++){
+      b.vy+=0.12;b.x+=b.vx*0.5;b.y+=b.vy*0.5;
+      if(b.x<6){b.x=6;b.vx=Math.abs(b.vx)*.5}
+      if(b.x>W-6){b.x=W-6;b.vx=-Math.abs(b.vx)*.5}
+      if(b.y<geo.binY-8){
+        for(const p of pegs){
+          const dx=b.x-p.x,dy=b.y-p.y;
+          if(Math.abs(dx)>10||Math.abs(dy)>10)continue;
+          const d=Math.hypot(dx,dy),R=8;
+          if(d<R&&d>0){
+            const nx=dx/d,ny=dy/d,dot=b.vx*nx+b.vy*ny;
+            b.x=p.x+nx*R;b.y=p.y+ny*R;
+            if(dot<0){b.vx-=1.55*dot*nx;b.vy-=1.55*dot*ny;b.vx+=(Math.random()-.5)*.5}
+            b.vx*=.97;b.vy*=.97;
+          }
+        }
+      }
+    }
+    if(b.vy>9)b.vy=9;
+    if(b.y>=geo.binY+6&&!b.done){
+      b.done=true;
+      let k=Math.floor((b.x-geo.x0)/geo.sx);k=Math.max(0,Math.min(S.rows,k));
+      land(k,b.bet);
+    }
+  }
+  balls=balls.filter(b=>!b.done);
+}
+function land(k,bet){
+  flash[k]=14;
+  const m=mults[k],win=Math.round(bet*m);
+  S.bal+=win;S.best=Math.max(S.best,S.bal);
+  const net=win-bet;
+  hist.unshift(net);hist=hist.slice(0,8);
+  $('msg').textContent=(net>=0?'You won ':'You lost ')+'$'+Math.abs(net)+'  ('+fmt(m)+'x)';
+  if(round){round.ret+=win;round.pending--}
+  ui();
+  if(round&&round.pending===0)showResult();
+}
+function showResult(){
+  const net=round.ret-round.stake,r=$('result'),pct=Math.round(round.ret/round.stake*100);
+  r.hidden=false;r.className='result '+(net>=0?'win':'lose');
+  r.innerHTML='<div class="rt">'+(net>0?'YOU WON':net<0?'YOU LOST':'BROKE EVEN')+'</div><div class="rn">'+(net>=0?'+$':'-$')+Math.abs(net)+'</div><div>Bet $'+round.stake+', returned $'+round.ret+' ('+pct+'% of your bet)</div>';
+  $('msg').textContent=net>0?'Nice drop!':net<0?'The dungeon takes its share.':'Even drop.';
+  round=null;ui();
+}
+function loop(){step();draw();requestAnimationFrame(loop)}
+function drop(){
+  const total=S.bet*S.balls;
+  if(total>S.bal){$('msg').textContent='Not enough balance. Lower the bet or balls.';return}
+  S.bal-=total;round={stake:total,ret:0,pending:S.balls};$('result').hidden=true;ui();
+  let i=0;
+  const t=setInterval(()=>{
+    const jitter=(Math.random()-.5)*geo.sx*.5;
+    balls.push({x:W/2+jitter,y:8,vx:(Math.random()-.5)*.6,vy:0,bet:S.bet,g:Math.floor(Math.random()*4)});
+    if(++i>=S.balls)clearInterval(t);
+  },140);
+  $('msg').textContent='Dropping '+S.balls+(S.balls>1?' gems':' gem')+'...';
+}
+function chips(id,arr,key,label){
+  const el=$(id);el.innerHTML='';
+  arr.forEach((v,i)=>{
+    const b=document.createElement('button');
+    b.textContent=label(v,i);
+    b.className=(key==='risk'?S.risk===i:S[key]===v)?'on':'';
+    b.onclick=()=>{S[key]=key==='risk'?i:v;if(key==='rows'||key==='risk'){build();flash={}}ui()};
+    el.appendChild(b);
+  });
+}
+function ui(){
+  $('bal').textContent='$'+S.bal;$('best').textContent='$'+S.best;
+  chips('bets',BETS,'bet',v=>'$'+v);
+  chips('risks',RISKS,'risk',v=>v);
+  chips('rows',ROWS,'rows',v=>v);
+  chips('balls',BALLS,'balls',v=>v);
+  $('cost').textContent='Cost per drop: $'+(S.bet*S.balls);
+  $('go').disabled=S.bet*S.balls>S.bal||!!round;
+  const h=$('hist');h.innerHTML='';
+  hist.forEach(n=>{const s=document.createElement('span');s.className=n>=0?'w':'l';s.textContent=(n>=0?'+$':'-$')+Math.abs(n);h.appendChild(s)});
+}
+$('go').onclick=drop;
+$('bonus').onclick=()=>{S.bal+=500;S.best=Math.max(S.best,S.bal);$('msg').textContent='Bonus +$500 added.';ui()};
+$('reset').onclick=()=>{S={bal:1000,best:1000,bet:100,risk:1,rows:12,balls:5};balls=[];hist=[];flash={};round=null;$('result').hidden=true;build();$('msg').textContent='Game reset.';ui()};
+build();ui();
+(document.fonts&&document.fonts.ready?document.fonts.ready:Promise.resolve()).then(()=>{});
+loop();
+</script></body></html>
