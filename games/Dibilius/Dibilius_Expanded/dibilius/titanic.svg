@@ -1,9 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 800">
-<defs><linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#210a3d"/><stop offset="1" stop-color="#5d2674"/></linearGradient></defs>
-<rect width="600" height="800" fill="url(#bg)"/>
-<circle cx="500" cy="100" r="90" fill="#d4af37" opacity=".12"/>
-<circle cx="80" cy="700" r="130" fill="#e8cf7a" opacity=".08"/>
-<path d="M85 400 L520 400 L445 500 L170 500 Z" fill="#222b46" stroke="#e8cf7a" stroke-width="8"/><rect x="190" y="320" width="230" height="80" fill="#e8cf7a"/><rect x="225" y="260" width="35" height="60" fill="#a22c43"/><rect x="290" y="260" width="35" height="60" fill="#a22c43"/><rect x="355" y="260" width="35" height="60" fill="#a22c43"/><path d="M50 540 Q120 510 190 540 T330 540 T470 540 T610 540" fill="none" stroke="#80c9e8" stroke-width="12"/><path d="M50 580 Q120 550 190 580 T330 580 T470 580 T610 580" fill="none" stroke="#80c9e8" stroke-width="12"/>
-<text x="300" y="660" fill="#f4df91" font-family="Georgia,serif" font-size="34" font-weight="bold" text-anchor="middle">TOO CONFIDENT</text>
-<text x="300" y="710" fill="#ffffff" font-family="Georgia,serif" font-size="22" text-anchor="middle">A legendary disaster.</text>
-</svg>
