@@ -32,7 +32,7 @@
     "desc": "Охота за пикселями",
     "title_en": "Pixel-hunt",
     "desc_en": "Pixel hunt game",
-    "path": "games/Pixel-hunt/",
+    "path": "games/Pixel-hunt/index.html",
     "color": "#3b82f6"
   },
   {
@@ -41,7 +41,7 @@
     "desc": "Своя «Премия Дарвина»: выбирай самые глупые и курьёзные поступки",
     "title_en": "Dibilius",
     "desc_en": "Own Darwin Awards: pick the dumbest and most absurd fails",
-    "path": "games/dibilius/",
+    "path": "games/dibilius/index.html",
     "color": "#ef4444"
   }
 ]
