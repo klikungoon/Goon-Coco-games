@@ -34,5 +34,14 @@
     "desc_en": "Pixel hunt game",
     "path": "games/pixel-hunt/",
     "color": "#3b82f6"
+  },
+  {
+    "title": "Dibilius",
+    "emoji": "🤪",
+    "desc": "Своя «Премия Дарвина»: выбирай самые глупые и курьёзные поступки",
+    "title_en": "Dibilius",
+    "desc_en": "Own Darwin Awards: pick the dumbest and most absurd fails",
+    "path": "games/dibilius/",
+    "color": "#ef4444"
   }
 ]
