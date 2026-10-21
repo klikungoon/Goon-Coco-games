@@ -44,4 +44,13 @@
     "path": "games/dibilius/index.html",
     "color": "#ef4444"
   }
+  {
+    "title": "Drop Dungeon",
+    "emoji": "💎",
+    "desc": "Игра плинко с виртуальными деньгами",
+    "title_en": "Drop Dungeon",
+    "desc_en": "The plinko game with virtual money",
+    "path": "games/gem-drop/index.html",
+    "color": "#679bf0"
+  }
 ]
