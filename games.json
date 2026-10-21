@@ -25,5 +25,14 @@
     "desc_en": "Guess which historical event happened first and build a long streak",
     "path": "games/history-timeline/",
     "color": "#8b5cf6"
+  },
+  {
+    "title": "Pixel-hunt",
+    "emoji": "🎯",
+    "desc": "Охота за пикселями",
+    "title_en": "Pixel-hunt",
+    "desc_en": "Pixel hunt game",
+    "path": "games/pixel-hunt/",
+    "color": "#3b82f6"
   }
 ]
